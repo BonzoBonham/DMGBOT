@@ -9,7 +9,7 @@ const MESSAGE_CODES = {
   "BOT_INFO": "botinfo"
 };
 
-const handleGamedigQuery = Gamedig.query(gamedigConfig).catch((error) => { console.log("Server is offline") });
+const handleGamedigQuery = () => Gamedig.query(gamedigConfig).catch((error) => { console.log("Server is offline") });
 //Function called every 30000 ms to update the "game" played by the bot
 function update(){
 

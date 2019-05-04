@@ -1,3 +1,7 @@
 {
-	"prefix": "!"
+	"prefix": "!",
+	"gamedigConfig": {
+	    "type": "garrysmod",
+	    "host": "66.151.244.2"
+	}
 }

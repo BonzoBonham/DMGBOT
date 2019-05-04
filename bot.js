@@ -1,8 +1,7 @@
-const botconfig = require("./botconfig.json");
+const { prefix, gamedigConfig } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const bot = new Discord.Client({disableEveryone: true});
-const { prefix, gamedigConfig } = new Discord.Client({disableEveryone: true});
 
 const MESSAGE_CODES = {
   "PLAYERS": "players",

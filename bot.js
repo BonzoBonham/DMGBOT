@@ -1,47 +1,41 @@
-const botconfig = require("./botconfig.json");
+const { prefix, gamedigConfig } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const bot = new Discord.Client({disableEveryone: true});
 
+const MESSAGE_CODES = {
+  "PLAYERS": "players",
+  "INVITE": "invite",
+  "BOT_INFO": "botinfo"
+};
+
+const handleGamedigQuery = () => Gamedig.query(gamedigConfig).catch((error) => { console.log("Server is offline") });
 //Function called every 30000 ms to update the "game" played by the bot
 function update(){
 
     //Server status query
-    Gamedig.query({
-        type: 'garrysmod',
-        host: '66.151.244.2'
-    }).then((state) => {
+    handleGamedigQuery().then((state) => {
         var status = state.players.length + " of " + state.maxplayers + " in map " + state.map;
         bot.user.setActivity(status, { type: 'PLAYING' })
         console.log("Status updated!")
-    }).catch((error) => {
-        console.log("Server is offline");
-    });
+    })
 };
 
 //Function called every 30000 ms to update the title of the voice channel with the server status
 function voicechannelupdate(){
 
     //Server status query
-    Gamedig.query({
-        type: 'garrysmod',
-        host: '66.151.244.2'
-    }).then((state) => {
+    handleGamedigQuery().then((state) => {
         var status = state.players.length + " in " + state.map;
         statuschannel = bot.channels.get("573022265416089603");
         statuschannel.setName(status);
         console.log("Status updated!")
-    }).catch((error) => {
-        console.log("Server is offline");
     });
 };
 
 function textchannelupdate(){
     //Server status query
-    Gamedig.query({
-        type: 'garrysmod',
-        host: '66.151.244.2'
-    }).then((state) => {
+    handleGamedigQuery().then((state) => {
         var i = 0;
         playerlist = ""
         playerArray = state.players;
@@ -50,11 +44,9 @@ function textchannelupdate(){
             playerlist = "The server is empty right now!";
         }
         while (i < playerArray.length) {
-            playerlist = playerlist + playerArray[i].name + `
-`;
+            playerlist = playerlist + playerArray[i].name + ``;
             i++;
         }
-        console.log(playerlist);
         statuschannel = bot.channels.get("573022289931796511");
         console.log("Status updated!")
 
@@ -65,13 +57,11 @@ function textchannelupdate(){
               console.log("last message's author is not a bot!")
             }
         }).catch(console.error);
-        
+
         lastMessage.edit(`${playerlist}`)
         .then(msg => console.log(`New message content: ${msg}`))
         .catch(console.error);
 
-    }).catch((error) => {
-        console.log("Server is offline");
     });
 }
 
@@ -83,9 +73,7 @@ bot.on("ready", async message => {
     bot.setInterval(voicechannelupdate,30000);
     statuschat = bot.channels.get("573022289931796511");
     statuschat.send("***Click this link to open up Garry's Mod and connect to the server!***");
-    statuschat.send(`steam://connect/66.151.244.2:27015
-
-`);
+    statuschat.send(`steam://connect/66.151.244.2:27015`);
     statuschat.send(".");
     statuschat.send("--------------------------**ONLINE PLAYERS**--------------------------");
     statuschat.send("Initializing...");
@@ -93,106 +81,52 @@ bot.on("ready", async message => {
 });
 
 //List of commands that can be called to the bot
-bot.on("message", async message => {
+
+const handleMessage = (message) => {
     if (message.author.bot) return;
     if (message.channel.type === "dm") return;
 
-    let prefix = botconfig.prefix;
     let messageArray = message.content.split(" ");
     let cmd = messageArray[0];
-    let args = messageArray.slice(1);
+    let prefix = botconfig.prefix;
+    // let args = messageArray.slice(1);
 
-    /*if (cmd === `${prefix}bonzo`){
-        //hello world command
+    // Allow l/u-case commands. Return an error if the command is invalid
+    if (!Object.values(MESSAGE_CODES).map((code) => prefix + code.toLowerCase()).find((code) => code === cmd.toLowerCase())) {
+      message.channel.send("Sorry! We didn't recognize that command.");
+    };
 
-        message.channel.send("hi, bonzo made me");
-
-        let chan = bot.channels.get("566030799573483524");
-        let lastMessage;
-
-        chan.fetchMessages({ limit: 1 }).then(messages => {
-            lastMessage = messages.first();
-            console.log("fetchin messages...")
-            if (!lastMessage.author.bot) {
-              console.log("last message's author is not a bot!")
-            }
-        })
-        .catch(console.error);
-        
-        setTimeout(function(){ 
-            lastMessage.edit('i say this now')
-            .then(msg => console.log(`New message content: ${msg}`))
-            .catch(console.error);
-        }, 3000);
-        return;
-    }*/
-
-    /*
-    if (cmd === `${prefix}info`){
-        //test richembed command
-        let botembed = new Discord.RichEmbed()
-        .setDescription("Bonzo gang")
-        .setColor("#00ff00")
-        .addField("Bot Name", bot.user.username);
-
-        return message.channel.send(botembed);
-    }*/
-
-    /*
-    if (cmd === `${prefix}dmg`){
-        let dmgstatus = new Discord.RichEmbed()
-        .setTitle("This is the title")
-        .setDescription("This is the description aaaaaaaaaaaaaaaaaaaaaaaah");
-
-        return message.channel.send(dmgstatus);
-    }*/
-
-    
-    if (cmd === `${prefix}botinfo`){
+    //bot command that returns bot info
+    if (cmd === `${prefix}${MESSAGE_CODES.BOT_INFO}`){
         message.channel.send("I was made by Bonzo, for the DMG Discord server!");
     }
 
     //bot command that returns amount of online players and map being played
-    if (cmd === `${prefix}invite`){
-        Gamedig.query({
-            type: 'garrysmod',
-            host: '66.151.244.2'
-        }).then((state) => {
-            console.log(state);
+    if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`){
+        handleGamedigQuery().then((state) => {
             message.channel.send(`The server has ${state.players.length} players on right now.`);
             message.channel.send(`The server is on the map ${state.map} right now.`);
             message.channel.send(`Come join us! steam://connect/66.151.244.2:27015`);
-        }).catch((error) => {
-            console.log("Server is offline");
         });
     }
 
     //bot command that returns the names of every online player
-    if (cmd === `${prefix}players`){
-        Gamedig.query({
-            type: 'garrysmod',
-            host: '66.151.244.2'
-        }).then((state) => {
-            console.log(state);
+    if (cmd === `${prefix}${MESSAGE_CODES.PLAYERS}`){
+        handleGamedigQuery().then((state) => {
             var i = 0;
             var playerlist = "";
-            console.log(playerlist)
             playerArray = state.players;
-            console.log(playerArray);
             while (i < playerArray.length) {
-                console.log("ahhhhhhhhhhhhhhhhhhhhhhh");
-                console.log(playerArray[i]);
                 playerlist = playerlist + playerArray[i].name + ", ";
                 i++;
             }
             message.author.send (playerlist);
-            message.channel.send ("Check your DM's for a list of online players!");  
-        }).catch((error) => {
-            console.log("Server is offline");
+            message.channel.send ("Check your DM's for a list of online players!");
         });
     }
 
-});
+}
 
+bot.on("message", async handleMessage);
 
 bot.login(process.env.BOT_TOKEN);//BOT_TOKEN is the Client Secret

@@ -66,7 +66,7 @@ function textchannelupdate(){
 }
 
 //Sets the "game" being played by the bot every 30 seconds
-bot.on("ready", async message => {
+bot.on("ready", (message) => {
     console.log(`${bot.user.username} is online!`);
     console.log("I am ready!");
     bot.setInterval(update,30000);
@@ -127,6 +127,6 @@ const handleMessage = (message) => {
 
 }
 
-bot.on("message", async handleMessage);
+bot.on("message", handleMessage);
 
 bot.login(process.env.BOT_TOKEN);//BOT_TOKEN is the Client Secret

@@ -3,9 +3,17 @@ const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const bot = new Discord.Client({disableEveryone: true});
 
-
 const TEXT_CHANNEL =  channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
+
+const DEFAULT_UPDATE_INTERVAL = 30000;
+
+const STEAM_SERVER_LINK = "steam://connect/66.151.244.2:27015";
+const STARTUP_MESSAGE_PLAYERS_KEY = "**ONLINE PLAYERS**";
+const STARTUP_MESSAGE = `
+***Click this link to open up Garry's Mod and connect to the server!***
+------------- ***` + STEAM_SERVER_LINK + `*** ---------------
+--------------------------` + STARTUP_MESSAGE_PLAYERS_KEY + `---------------------------`;
 
 bot.on("error", console.error);
 
@@ -53,49 +61,57 @@ function voicechannelupdate(){
     }).catch(console.error);
 };
 
-//Function called every 30000ms to update the playerlist in the player list channel
-function textchannelupdate(){
-    //let lastMessage;
-    //Server status query
-    handleGamedigQuery().then((state) => {
-      var i = 0;
-      let playerArray = state.players;
-      let playerList = "";
-      console.log("getting players...")
-      if (playerArray.length == 0) {
-          playerList = "The server is empty right now!";
-      }
-      playerList = playerArray.map((ply) => ply.name).join(", ");
-      let statuschannel = bot.channels.get(TEXT_CHANNEL);
-      console.log("Status updated!")
+const getActivePlayers = () =>
+  handleGamedigQuery().then((state) => {
+      return Promise.resolve(state.players.length ? state.players.map((ply) => ply.name).join(", ") : "");
+  }).catch(console.error);
 
-      return statuschannel.fetchMessages({ limit: 1 })
+//Function called every 30000ms to update the playerlist in the player list channel
+function textchannelupdate(message, channel){
+
+  //let lastMessage;
+  //Server status query
+  getActivePlayers()
+    .then((players) => {
+
+      players = (players.length ? players : "----***There are no players online right now, be the first to join!***----");
+
+      updateMessage = message + "\n" + players;
+
+      return channel.fetchMessages()
         .then((messages) => {
-          let lastMessage = messages.first();
-          console.log("fetchin messages...")
-          if (!lastMessage.author.bot) {
-          console.log("last message's author is not a bot!")
-          }
-          return lastMessage.edit(`${playerList}`)
-          })
-        .then((msg) => console.log(`New message content: ${msg}`));
+
+          // Ensure we obtain the first message sent with the startup-message
+          let sortedMessages = [...messages].sort((fm, sm) => fm[0] - sm[0]).map((msg) => msg[1])
+            .filter(({author, content}) => content.includes(STARTUP_MESSAGE_PLAYERS_KEY) && author.bot)
+
+          let lastMessage =  sortedMessages[sortedMessages.length - 1];
+
+          // If the startup message is not in the list, send it baby.
+          if (!lastMessage) return channel.send(updateMessage);
+
+          return lastMessage.edit(STARTUP_MESSAGE + "\n" + players);
+        })
+        // .then((msg) => console.log(`New message content: ${msg}`))
+        .catch((err) => {
+
+          console.log(err);
+
+        });
 
     }).catch(console.error);
 }
 
 //Sets the "game" being played by the bot every 30 seconds
-bot.on("ready", async function(message) {
+bot.on("ready", async function() {
     console.log(`${bot.user.username} is online!`);
     console.log("I am ready!");
-    bot.setInterval(activityupdate,30000);
-    bot.setInterval(voicechannelupdate,30000);
-    statuschat = bot.channels.get(TEXT_CHANNEL);
-    statuschat.send(`
-    ***Click this link to open up Garry's Mod and connect to the server!***
-    -------------steam://connect/66.151.244.2:27015 -------------
-    ------------------------**ONLINE PLAYERS**------------------------
-    Initializing...`);
-    bot.setInterval(textchannelupdate,30000);
+    bot.setInterval(activityupdate,DEFAULT_UPDATE_INTERVAL);
+    bot.setInterval(voicechannelupdate,DEFAULT_UPDATE_INTERVAL);
+    let message = STARTUP_MESSAGE;
+    const firstTCU = () => textchannelupdate(message, bot.channels.get(TEXT_CHANNEL));
+    firstTCU();
+    bot.setInterval(firstTCU,DEFAULT_UPDATE_INTERVAL);
 });
 
 //List of commands that can be called to the bot
@@ -125,7 +141,7 @@ const handleMessage = (message) => {
         handleGamedigQuery().then((state) => {
             message.channel.send("The server has " + state.players.length + " players on right now.\n"
             + "The server is on the map " + state.map + " right now.\n"
-            + "Come join us! steam://connect/66.151.244.2:27015");
+            + "Come join us! " + STEAM_SERVER_LINK);
 
 
             return Promise.resolve();
@@ -134,14 +150,11 @@ const handleMessage = (message) => {
 
     //bot command that returns the names of every online player
     if (cmd === `${prefix}${MESSAGE_CODES.PLAYERS}`){
-        handleGamedigQuery().then((state) => {
-            var i = 0;
-            let playerList = state.players.map((ply) => ply.name).join(", ");
-            console.log(playerList);
-            message.author.send("Online Players: " + playerList)
-            message.channel.send ("Check your DM's for a list of online players!");
-            return Promise.resolve();
-        }).catch(console.error);
+      getActivePlayers()
+        .then((players) => {
+          message.author.send("Player List: " + (players.length ? players : "No online players."))
+          message.channel.send ("Check your DM's for a list of online players!");
+        })
     }
 };
 

@@ -88,58 +88,53 @@ bot.on("ready", async message => {
 });
 
 //List of commands that can be called to the bot
-bot.on("message", async message => {
+const handleMessage = (message) => {
     if (message.author.bot) return;
     if (message.channel.type === "dm") return;
 
-    let prefix = prefie;
     let messageArray = message.content.split(" ");
     let cmd = messageArray[0];
-    let args = messageArray.slice(1);
+    let prefix = botconfig.prefix;
+    // let args = messageArray.slice(1);
 
-    if (cmd === `${prefix}botinfo`){
+    // Allow l/u-case commands. Return an error if the command is invalid
+    if (!Object.values(MESSAGE_CODES).map((code) => prefix + code.toLowerCase()).find((code) => code === cmd.toLowerCase())) {
+      message.channel.send("Sorry! We didn't recognize that command.");
+    };
+
+    //bot command that returns bot info
+    if (cmd === `${prefix}${MESSAGE_CODES.BOT_INFO}`){
         message.channel.send("I was made by Bonzo, for the DMG Discord server!");
     }
 
     //bot command that returns amount of online players and map being played
-    if (cmd === `${prefix}invite`){
-        Gamedig.query({
-            type: 'garrysmod',
-            host: '66.151.244.2'
-        }).then((state) => {
-            console.log(state);
-            message.channel.send(`The server has ${state.players.length} players on, and is on the map ${state.map} right now. Come join us! steam://connect/66.151.244.2:27015`);
-        }).catch((error) => {
-            console.log("Server is offline");
+    if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`){
+        handleGamedigQuery().then((state) => {
+            message.channel.send(`The server has ${state.players.length} players on right now.`);
+            message.channel.send(`The server is on the map ${state.map} right now.`);
+            message.channel.send(`Come join us! steam://connect/66.151.244.2:27015`);
         });
     }
 
     //bot command that returns the names of every online player
-    if (cmd === `${prefix}players`){
-        Gamedig.query({
-            type: 'garrysmod',
-            host: '66.151.244.2'
-        }).then((state) => {
-            console.log(state);
+    if (cmd === `${prefix}${MESSAGE_CODES.PLAYERS}`){
+        handleGamedigQuery().then((state) => {
             var i = 0;
             var playerlist = "";
-            console.log(playerlist)
             playerArray = state.players;
-            console.log(playerArray);
             while (i < playerArray.length) {
-                console.log("ahhhhhhhhhhhhhhhhhhhhhhh");
-                console.log(playerArray[i]);
                 playerlist = playerlist + playerArray[i].name + ", ";
                 i++;
             }
             message.author.send (playerlist);
-            message.channel.send ("Check your DM's for a list of online players!");  
-        }).catch((error) => {
-            console.log("Server is offline");
+            message.channel.send ("Check your DM's for a list of online players!");
         });
     }
 
-});
+}
+
+bot.on("message", handleMessage);
+
 
 
 bot.login(process.env.BOT_TOKEN);//BOT_TOKEN is the Client Secret

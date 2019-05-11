@@ -4,8 +4,8 @@ const Gamedig = require('gamedig');
 const bot = new Discord.Client({disableEveryone: true});
 
 
-const TEXT_CHANNEL =  "229700262833422337";
-const VOICE_CHANNEL = "229700262833422337";
+const TEXT_CHANNEL =  "573022289931796511";
+const VOICE_CHANNEL = "573022265416089603";
 
 bot.on("error", console.error);
 

@@ -1,7 +1,8 @@
-const { prefix, gamedigConfig } = require("./botconfig.json");
+const { prefie, token, gamedigConfig } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const bot = new Discord.Client({disableEveryone: true});
+
 
 const TEXT_CHANNEL = "573022289931796511";
 const VOICE_CHANNEL = "573022265416089603";
@@ -12,12 +13,13 @@ bot.on("error", console.error);
 process.on("unhandledRejection", function(err, promise) {
     console.error("Unhandled rejection (promise: ", promise, ", reason: ", err, ").");
 });
-
+//Message codes for the bot functions
 const MESSAGE_CODES = {
-  "PLAYERS": "players",
-  "INVITE": "invite",
-  "BOT_INFO": "botinfo"
-};
+    "PLAYERS": "players",
+    "INVITE": "invite",
+    "BOT_INFO": "botinfo"
+  };
+
 
 const handleGamedigQuery = () => new Promise((resolve) => {
   return Gamedig.query(gamedigConfig)
@@ -26,20 +28,17 @@ const handleGamedigQuery = () => new Promise((resolve) => {
 });
 
 //Function called every 30000 ms to update the "game" played by the bot
-function update() {
-
-    //Server status query
+function activityupdate(){
     handleGamedigQuery().then((state) => {
-        var status = state.players.length + " of " + state.maxplayers + " in map " + state.map;
-        bot.user.setActivity(status, { type: 'PLAYING' });
-        console.log("Status updated!");
-        Promise.resolve();
-    }).catch(console.error);
+
+        var status = state.players.length + " in " + state.map;
+        bot.user.setActivity(status, { type: 'PLAYING' })
+        console.log("Bot activity status updated!")
+    });
 };
 
 //Function called every 30000 ms to update the title of the voice channel with the server status
 function voicechannelupdate(){
-
     //Server status query
     handleGamedigQuery().then((state) => {
         var status = state.players.length + " in " + state.map;
@@ -50,7 +49,9 @@ function voicechannelupdate(){
     }).catch(console.error);
 };
 
+//Function called every 30000ms to update the playerlist in the player list channel
 function textchannelupdate(){
+    //let lastMessage;
     //Server status query
     handleGamedigQuery().then((state) => {
       var i = 0;
@@ -85,19 +86,17 @@ function textchannelupdate(){
 bot.on("ready", async function(message) {
     console.log(`${bot.user.username} is online!`);
     console.log("I am ready!");
-    bot.setInterval(update,30000);
+    bot.setInterval(activityupdate,30000);
     bot.setInterval(voicechannelupdate,30000);
     statuschat = bot.channels.get(TEXT_CHANNEL);
     statuschat.send("***Click this link to open up Garry's Mod and connect to the server!***");
     statuschat.send(`steam://connect/66.151.244.2:27015`);
-    statuschat.send(".");
     statuschat.send("--------------------------**ONLINE PLAYERS**--------------------------");
     statuschat.send("Initializing...");
     bot.setInterval(textchannelupdate,30000);
 });
 
 //List of commands that can be called to the bot
-
 const handleMessage = (message) => {
 
     if (message === undefined) return;
@@ -146,6 +145,5 @@ const handleMessage = (message) => {
 
 
 bot.on("message", async function(message) { return handleMessage(message); });
-
 
 bot.login(process.env.BOT_TOKEN);//BOT_TOKEN is the Client Secret

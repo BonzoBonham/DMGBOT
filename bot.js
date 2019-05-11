@@ -1,11 +1,11 @@
-const { prefie, token, gamedigConfig } = require("./botconfig.json");
+const { prefix, token, gamedigConfig } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const bot = new Discord.Client({disableEveryone: true});
 
 
-const TEXT_CHANNEL = "573022289931796511";
-const VOICE_CHANNEL = "573022265416089603";
+const TEXT_CHANNEL =  "229700262833422337";//"573022289931796511";
+const VOICE_CHANNEL = "229700262833422337"; //"573022265416089603";
 
 bot.on("error", console.error);
 
@@ -124,6 +124,7 @@ const handleMessage = (message) => {
             message.channel.send(`The server has ${state.players.length} players on right now.`);
             message.channel.send(`The server is on the map ${state.map} right now.`);
             message.channel.send(`Come join us! steam://connect/66.151.244.2:27015`);
+            return Promise.resolve();
         }).catch(console.error);
     }
 
@@ -131,14 +132,11 @@ const handleMessage = (message) => {
     if (cmd === `${prefix}${MESSAGE_CODES.PLAYERS}`){
         handleGamedigQuery().then((state) => {
             var i = 0;
-            var playerlist = "";
-            playerArray = state.players;
-            while (i < playerArray.length) {
-                playerlist = playerlist + playerArray[i].name + ", ";
-                i++;
-            }
-            message.author.send (playerlist);
+            let playerList = state.players.map((ply) => ply.name).join(",");
+            console.log(playerList);
+            message.author.send(playerList)
             message.channel.send ("Check your DM's for a list of online players!");
+            return Promise.resolve();
         }).catch(console.error);
     }
 };
@@ -146,4 +144,4 @@ const handleMessage = (message) => {
 
 bot.on("message", async function(message) { return handleMessage(message); });
 
-bot.login(process.env.BOT_TOKEN);//BOT_TOKEN is the Client Secret
+bot.login(token ? token : process.env.BOT_TOKEN);//BOT_TOKEN is the Client Secret

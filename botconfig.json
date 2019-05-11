@@ -3,5 +3,10 @@
 	"gamedigConfig": {
 	    "type": "garrysmod",
 	    "host": "66.151.244.2"
-	}
+	},
+	"channels": {
+		"TEXT": "573022289931796511",
+		"VOICE": "573022265416089603"
+	},
+	"token": null
 }

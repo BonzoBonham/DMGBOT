@@ -1,16 +1,20 @@
-const { prefix, token, gamedigConfig } = require("./botconfig.json");
+const { prefix, token, gamedigConfig, channels } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const bot = new Discord.Client({disableEveryone: true});
 
 
-const TEXT_CHANNEL =  "573022289931796511";
-const VOICE_CHANNEL = "573022265416089603";
+const TEXT_CHANNEL =  channels.TEXT;
+const VOICE_CHANNEL = channels.VOICE;
 
 bot.on("error", console.error);
 
 // Handle potential uncaught errors resulting from dependencies.
 process.on("unhandledRejection", function(err, promise) {
+    // ignore improperly-chained promise rejections from Sequential.js
+    if (err.stack.includes("Sequential.js:79:15")) {
+      return;
+    }
     console.error("Unhandled rejection (promise: ", promise, ", reason: ", err, ").");
 });
 //Message codes for the bot functions
@@ -55,17 +59,13 @@ function textchannelupdate(){
     //Server status query
     handleGamedigQuery().then((state) => {
       var i = 0;
-      playerlist = ""
-      playerArray = state.players;
+      let playerArray = state.players;
+      let playerList = "";
       console.log("getting players...")
       if (playerArray.length == 0) {
-          playerlist = "The server is empty right now!";
+          playerList = "The server is empty right now!";
       }
-      while (i < playerArray.length) {
-          playerlist = playerlist + playerArray[i].name + `
-`;
-          i++;
-      }
+      playerList = playerArray.map((ply) => ply.name).join(", ");
       let statuschannel = bot.channels.get(TEXT_CHANNEL);
       console.log("Status updated!")
 
@@ -76,7 +76,7 @@ function textchannelupdate(){
           if (!lastMessage.author.bot) {
           console.log("last message's author is not a bot!")
           }
-          return lastMessage.edit(`${playerlist}`)
+          return lastMessage.edit(`${playerList}`)
           })
         .then((msg) => console.log(`New message content: ${msg}`));
 
@@ -90,10 +90,11 @@ bot.on("ready", async function(message) {
     bot.setInterval(activityupdate,30000);
     bot.setInterval(voicechannelupdate,30000);
     statuschat = bot.channels.get(TEXT_CHANNEL);
-    statuschat.send("***Click this link to open up Garry's Mod and connect to the server!***");
-    statuschat.send(`steam://connect/66.151.244.2:27015`);
-    statuschat.send("--------------------------**ONLINE PLAYERS**--------------------------");
-    statuschat.send("Initializing...");
+    statuschat.send(`
+    ***Click this link to open up Garry's Mod and connect to the server!***
+    -------------steam://connect/66.151.244.2:27015 -------------
+    ------------------------**ONLINE PLAYERS**------------------------
+    Initializing...`);
     bot.setInterval(textchannelupdate,30000);
 });
 
@@ -122,9 +123,11 @@ const handleMessage = (message) => {
     //bot command that returns amount of online players and map being played
     if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`){
         handleGamedigQuery().then((state) => {
-            message.channel.send(`The server has ${state.players.length} players on right now.`);
-            message.channel.send(`The server is on the map ${state.map} right now.`);
-            message.channel.send(`Come join us! steam://connect/66.151.244.2:27015`);
+            message.channel.send("The server has " + state.players.length + " players on right now.\n"
+            + "The server is on the map " + state.map + " right now.\n"
+            + "Come join us! steam://connect/66.151.244.2:27015");
+
+
             return Promise.resolve();
         }).catch(console.error);
     }
@@ -133,9 +136,9 @@ const handleMessage = (message) => {
     if (cmd === `${prefix}${MESSAGE_CODES.PLAYERS}`){
         handleGamedigQuery().then((state) => {
             var i = 0;
-            let playerList = state.players.map((ply) => ply.name).join(",");
+            let playerList = state.players.map((ply) => ply.name).join(", ");
             console.log(playerList);
-            message.author.send(playerList)
+            message.author.send("Online Players: " + playerList)
             message.channel.send ("Check your DM's for a list of online players!");
             return Promise.resolve();
         }).catch(console.error);

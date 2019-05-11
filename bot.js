@@ -62,7 +62,8 @@ function textchannelupdate(){
           playerlist = "The server is empty right now!";
       }
       while (i < playerArray.length) {
-          playerlist = playerlist + playerArray[i].name + ``;
+          playerlist = playerlist + playerArray[i].name + `
+`;
           i++;
       }
       let statuschannel = bot.channels.get(TEXT_CHANNEL);

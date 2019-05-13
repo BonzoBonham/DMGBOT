@@ -90,7 +90,8 @@ function textchannelupdate(message, channel){
           // If the startup message is not in the list, send it baby.
           if (!lastMessage) return channel.send(updateMessage);
 
-          return lastMessage.edit(STARTUP_MESSAGE + "\n" + players);
+          return lastMessage.edit(STARTUP_MESSAGE + `
+` + players);
         })
         // .then((msg) => console.log(`New message content: ${msg}`))
         .catch((err) => {

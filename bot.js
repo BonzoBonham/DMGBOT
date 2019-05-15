@@ -5,6 +5,7 @@ const bot = new Discord.Client({disableEveryone: true});
 
 const TEXT_CHANNEL =  channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
+const APPLICATION_CHANNEL = channels.APPLICATION;
 
 const DEFAULT_UPDATE_INTERVAL = 30000; // Thirty seconds
 
@@ -12,7 +13,8 @@ const DEFAULT_UPDATE_INTERVAL = 30000; // Thirty seconds
 const MESSAGE_CODES = {
     "PLAYERS": "players",
     "INVITE": "invite",
-    "BOT_INFO": "botinfo"
+    "BOT_INFO": "botinfo",
+    "APPLY": "apply"
   };
 
 const STEAM_SERVER_LINK = "steam://connect/66.151.244.2:27015";
@@ -101,7 +103,7 @@ const handleMessage = (message) => {
 
     let messageArray = message.content.split(" ");
     let cmd = messageArray[0];
-    // let args = messageArray.slice(1);
+    let args = messageArray.slice(1);
 
     // Allow l/u-case commands. Return an error if the command is invalid
     if (!Object.values(MESSAGE_CODES).map((code) => prefix + code.toLowerCase()).find((code) => code === cmd.toLowerCase())) {
@@ -131,6 +133,28 @@ const handleMessage = (message) => {
           message.channel.send ("Check your DM's for a list of online players!");
         })
     }
+
+    //bot command that lets a user apply to be a part of the staff team
+    if (cmd === `${prefix}${MESSAGE_CODES.APPLY}`){
+      //!apply hey this is why im applying hahalmao
+      let aUser = message.author.username; //gets applicant's username
+      let isDetective = message.member.roles.find(r => r.name === "Detective"); //applying user must be detective
+      let aMessage = args; //gets applicant's application message
+
+      if (!isDetective){
+        message.channel.send ("Permission denied! Only detectives can apply to be staff!");
+      } else {
+        let applicationEmbed = new Discord.RichEmbed()
+        .setDescription("Staff Member Application")
+        .setColor("#3fc627")
+        .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`);
+
+        message.delete().catch(O_o => {console.log("Failed to delete message!")});
+        bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed);
+        return;
+      }
+    }
+
 };
 
 // Create a function-wrapper for the interval function to avoid duplicity.

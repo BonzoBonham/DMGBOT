@@ -139,15 +139,16 @@ const handleMessage = (message) => {
       //!apply hey this is why im applying hahalmao
       let aUser = message.author.username; //gets applicant's username
       let isDetective = message.member.roles.find(r => r.name === "Detective"); //applying user must be detective
-      let aMessage = args; //gets applicant's application message
+      let aMessage = args.join(" ");
 
       if (!isDetective){
         message.channel.send ("Permission denied! Only detectives can apply to be staff!");
       } else {
         let applicationEmbed = new Discord.RichEmbed()
-        .setDescription("Staff Member Application")
         .setColor("#3fc627")
-        .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`);
+        .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)
+        .setDescription("Vote with reactions!");
+
 
         message.delete().catch(O_o => {console.log("Failed to delete message!")});
         bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed);

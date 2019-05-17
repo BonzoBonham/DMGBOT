@@ -131,7 +131,7 @@ const handleMessage = (message) => {
     //bot command that changes the status for recieving applications
     if (cmd === `${prefix}${MESSAGE_CODES.CHANGE_APPLICATION}`){
       let isCM = message.member.roles.find(r => r.name === "Community Manager"); //user using !apps must be community manager
-      if (!isCm){
+      if (!isCM){
         message.channel.send ("Permission denied!");
         return;
       }

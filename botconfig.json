@@ -9,5 +9,6 @@
 		"VOICE": "573022265416089603",
 		"APPLICATION": "578013891523510283"
 	},
-	"token": null
+	"token": null,
+	"appstatus": true
 }

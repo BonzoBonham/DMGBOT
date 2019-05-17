@@ -1,8 +1,10 @@
-const { prefix, token, gamedigConfig, channels } = require("./botconfig.json");
+const { prefix, token, gamedigConfig, channels, appstatus } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
+const fs = require('fs');
 const bot = new Discord.Client({disableEveryone: true});
 
+let application_status = appstatus;
 const TEXT_CHANNEL =  channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
 const APPLICATION_CHANNEL = channels.APPLICATION;
@@ -14,7 +16,8 @@ const MESSAGE_CODES = {
     "PLAYERS": "players",
     "INVITE": "invite",
     "BOT_INFO": "botinfo",
-    "APPLY": "apply"
+    "APPLY": "apply",
+    "CHANGE_APPLICATION": "apps" 
   };
 
 const STEAM_SERVER_LINK = "steam://connect/66.151.244.2:27015";
@@ -125,6 +128,25 @@ const handleMessage = (message) => {
         }).catch(console.error);
     }
 
+    //bot command that changes the status for recieving applications
+    if (cmd === `${prefix}${MESSAGE_CODES.CHANGE_APPLICATION}`){
+      var fileName = './botconfig.json';
+      var file = require(fileName);
+      file.appstatus = !application_status;
+
+      fs.writeFile(fileName, JSON.stringify(file), function (err) {
+        if (err) return console.log(err);
+        JSON.stringify(file, null, 2)
+        console.log('writing to ' + fileName);
+      });
+
+      if(file.appstatus){
+        message.channel.send("Settings updated! We are now recieving applications.");
+      } else {
+        message.channel.send("Settings updated! We are currently not recieving applications.");
+      }
+    }
+
     //bot command that returns the names of every online player
     if (cmd === `${prefix}${MESSAGE_CODES.PLAYERS}`){
       getActivePlayers()
@@ -140,7 +162,11 @@ const handleMessage = (message) => {
       let aUser = message.author.username; //gets applicant's username
       let isDetective = message.member.roles.find(r => r.name === "Detective"); //applying user must be detective
       let aMessage = args.join(" ");
-
+      
+      if (!appstatus){
+        message.channel.send ("Permission denied! We are currently not recieving applications.");
+        return;
+      }
       if (!isDetective){
         message.channel.send ("Permission denied! Only detectives can apply to be staff!");
       } else {

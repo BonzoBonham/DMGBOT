@@ -175,7 +175,7 @@ const handleMessage = (message) => {
         message.delete().catch(O_o => {console.log("Failed to delete message!")});
         bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed)
         .then(embedMessage => {
-          embedMessage.react("👍").then(() => message.react('👎'))
+          embedMessage.react("👍").then(() => embedMessage.react('👎'))
         }).catch(() => console.error('One of the emojis failed to react.'));
 
         return;

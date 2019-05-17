@@ -115,7 +115,7 @@ const handleMessage = (message) => {
 
     //bot command that returns bot info
     if (cmd === `${prefix}${MESSAGE_CODES.BOT_INFO}`){
-        message.channel.send("I was made by Bonzo, for the DMG Discord server!");
+        message.channel.send("I was made by Bonzo and John, for the DMG Discord server!");
     }
 
     //bot command that returns amount of online players and map being played
@@ -173,7 +173,12 @@ const handleMessage = (message) => {
 
 
         message.delete().catch(O_o => {console.log("Failed to delete message!")});
-        bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed);
+        bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed)
+        .then(embedMessage => {
+          embedMessage.react("👍");
+          embedMessage.react("👎");
+        });
+
         return;
       }
     }

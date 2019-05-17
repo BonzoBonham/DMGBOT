@@ -1,10 +1,10 @@
-const { prefix, token, gamedigConfig, channels, appstatus } = require("./botconfig.json");
+const { prefix, token, gamedigConfig, channels } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const fs = require('fs');
 const bot = new Discord.Client({disableEveryone: true});
 
-let application_status = appstatus;
+let appstatus = true;
 const TEXT_CHANNEL =  channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
 const APPLICATION_CHANNEL = channels.APPLICATION;
@@ -130,17 +130,9 @@ const handleMessage = (message) => {
 
     //bot command that changes the status for recieving applications
     if (cmd === `${prefix}${MESSAGE_CODES.CHANGE_APPLICATION}`){
-      var fileName = './botconfig.json';
-      var file = require(fileName);
-      file.appstatus = !application_status;
-
-      fs.writeFile(fileName, JSON.stringify(file), function (err) {
-        if (err) return console.log(err);
-        JSON.stringify(file, null, 2)
-        console.log('writing to ' + fileName);
-      });
-
-      if(file.appstatus){
+      
+      appstatus = !appstatus;
+      if(appstatus){
         message.channel.send("Settings updated! We are now recieving applications.");
       } else {
         message.channel.send("Settings updated! We are currently not recieving applications.");
@@ -162,7 +154,7 @@ const handleMessage = (message) => {
       let aUser = message.author.username; //gets applicant's username
       let isDetective = message.member.roles.find(r => r.name === "Detective"); //applying user must be detective
       let aMessage = args.join(" ");
-      
+
       if (!appstatus){
         message.channel.send ("Permission denied! We are currently not recieving applications.");
         return;

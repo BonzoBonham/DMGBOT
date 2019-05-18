@@ -1,4 +1,5 @@
 const { prefix, token, gamedigConfig, channels } = require("./botconfig.json");
+const { handleCurrencyUpdate, handleWriteJSON } = require("./serverops.js");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const bot = new Discord.Client({disableEveryone: true});
@@ -12,7 +13,8 @@ const DEFAULT_UPDATE_INTERVAL = 30000; // Thirty seconds
 const MESSAGE_CODES = {
     "PLAYERS": "players",
     "INVITE": "invite",
-    "BOT_INFO": "botinfo"
+    "BOT_INFO": "botinfo",
+    "VBUCKS": "tovbucks"
   };
 
 const STEAM_SERVER_LINK = "steam://connect/66.151.244.2:27015";
@@ -103,6 +105,8 @@ const handleMessage = (message) => {
     let cmd = messageArray[0];
     // let args = messageArray.slice(1);
 
+
+
     // Allow l/u-case commands. Return an error if the command is invalid
     if (!Object.values(MESSAGE_CODES).map((code) => prefix + code.toLowerCase()).find((code) => code === cmd.toLowerCase())) {
       message.channel.send("Sorry! We didn't recognize that command.");
@@ -131,6 +135,39 @@ const handleMessage = (message) => {
           message.channel.send ("Check your DM's for a list of online players!");
         })
     }
+
+    if (cmd === `${prefix}${MESSAGE_CODES.VBUCKS}`){
+
+      const money = messageArray[1];
+      const type = messageArray[2];
+
+      const errorMessage = "Please try again. This command must be a 3-character currency-type followed by a currency-value.";
+
+      if (type && type.length === 3 && money && parseFloat(money) && parseFloat(money) > 0) {
+
+        handleCurrencyUpdate(type, parseFloat(money))
+          .then((result) => {
+
+            message.channel.send("***ATTENTION***: ALL EPIC FORTNITE GAMERS: \n" + money + " " + type + " equates to " + result.toFixed(2) + " V-Bucks.");
+
+          })
+          .catch((err) => {
+
+            message.channel.send(errorMessage);
+
+          });
+
+      } else {
+
+        message.channel.send(errorMessage);
+
+      }
+
+
+
+    }
+
+
 };
 
 // Create a function-wrapper for the interval function to avoid duplicity.

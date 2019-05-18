@@ -2,10 +2,13 @@ const { prefix, token, gamedigConfig, channels } = require("./botconfig.json");
 const { handleCurrencyUpdate, handleWriteJSON } = require("./serverops.js");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
+const fs = require('fs');
 const bot = new Discord.Client({disableEveryone: true});
 
+let appstatus = true;
 const TEXT_CHANNEL =  channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
+const APPLICATION_CHANNEL = channels.APPLICATION;
 
 const DEFAULT_UPDATE_INTERVAL = 30000; // Thirty seconds
 
@@ -15,6 +18,8 @@ const MESSAGE_CODES = {
     "INVITE": "invite",
     "BOT_INFO": "botinfo",
     "VBUCKS": "tovbucks"
+    "APPLY": "apply",
+    "CHANGE_APPLICATION": "apps"
   };
 
 const STEAM_SERVER_LINK = "steam://connect/66.151.244.2:27015";
@@ -103,7 +108,7 @@ const handleMessage = (message) => {
 
     let messageArray = message.content.split(" ");
     let cmd = messageArray[0];
-    // let args = messageArray.slice(1);
+    let args = messageArray.slice(1);
 
 
 
@@ -114,7 +119,7 @@ const handleMessage = (message) => {
 
     //bot command that returns bot info
     if (cmd === `${prefix}${MESSAGE_CODES.BOT_INFO}`){
-        message.channel.send("I was made by Bonzo, for the DMG Discord server!");
+        message.channel.send("I was made by Bonzo and John, for the DMG Discord server!");
     }
 
     //bot command that returns amount of online players and map being played
@@ -125,6 +130,21 @@ const handleMessage = (message) => {
             + "Come join us! " + STEAM_SERVER_LINK);
             return Promise.resolve();
         }).catch(console.error);
+    }
+
+    //bot command that changes the status for recieving applications
+    if (cmd === `${prefix}${MESSAGE_CODES.CHANGE_APPLICATION}`){
+      let isCM = message.member.roles.find(r => r.name === "Community Manager"); //user using !apps must be community manager
+      if (!isCM){
+        message.channel.send ("Permission denied!");
+        return;
+      }
+      appstatus = !appstatus;
+      if(appstatus){
+        message.channel.send("Settings updated! We are now recieving applications.");
+      } else {
+        message.channel.send("Settings updated! We are currently not recieving applications.");
+      }
     }
 
     //bot command that returns the names of every online player
@@ -167,7 +187,35 @@ const handleMessage = (message) => {
 
     }
 
+    //bot command that lets a user apply to be a part of the staff team
+    if (cmd === `${prefix}${MESSAGE_CODES.APPLY}`){
+      //!apply hey this is why im applying hahalmao
+      let aUser = message.author.username; //gets applicant's username
+      let isDetective = message.member.roles.find(r => r.name === "Detective"); //applying user must be detective
+      let aMessage = args.join(" ");
 
+      if (!appstatus){
+        message.channel.send ("Permission denied! We are currently not recieving applications.");
+        return;
+      }
+      if (!isDetective){
+        message.channel.send ("Permission denied! Only detectives can apply to be staff!");
+      } else {
+        let applicationEmbed = new Discord.RichEmbed()
+        .setColor("#3fc627")
+        .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)
+        .setDescription("Vote with reactions!");
+
+
+        message.delete().catch(O_o => {console.log("Failed to delete message!")});
+        bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed)
+        .then(embedMessage => {
+          embedMessage.react("👍").then(() => embedMessage.react('👎'))
+        }).catch(() => console.error('One of the emojis failed to react.'));
+
+        return;
+      }
+    }
 };
 
 // Create a function-wrapper for the interval function to avoid duplicity.

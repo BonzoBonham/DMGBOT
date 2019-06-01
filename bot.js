@@ -166,6 +166,7 @@ const handleMessage = (message) => {
       if (!isDetective){
         message.channel.send ("Permission denied! Only detectives can apply to be staff!");
       } else {
+        message.channel.send ("Thanks for your application! Give us a week to look over it, and we'll get back to you!");
         let applicationEmbed = new Discord.RichEmbed()
         .setColor("#3fc627")
         .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)

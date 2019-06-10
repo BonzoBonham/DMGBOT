@@ -168,14 +168,40 @@ const handleMessage = (message) => {
         message.channel.send ("Permission denied! Only detectives can apply to be staff!");
         return;
       } else {
-        message.author.send ("Thanks for your application! You must add a reason for it, type it now!");
+        message.author.send ("Thanks for your application! You must add a reason for it, type it now in the channel you first typed !apply on.");
 
-        const collector = new Discord.MessageCollector(message.author.dmChannel , m => m.author.id === message.author.id, { time: 10000 });
+        const collector = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 10000 });
         console.log(collector)
         collector.on('collect', message => {
             if (message.content.length <= 10) {
-                message.author.send("Your application message should be longer than 10 characters! Type !apply to try again.");
+                message.author.send("Your application message should be longer than 10 characters! Type !apply to try");
             } else {
+                message.author.send("Are you sure you want that to be your application message? Confirm or deny with the reactions!");
+
+
+                message.react('👍').then(() => message.react('👎'));
+
+                const filter = (reaction, user) => {
+                    return ['👍', '👎'].includes(reaction.emoji.name) && user.id === message.author.id;
+                };
+
+                message.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] })
+                    .then(collected => {
+                        const reaction = collected.first();
+
+                        if (reaction.emoji.name === '👍') {
+                            message.reply('you reacted with a thumbs up.');
+                        }
+                        else {
+                            message.reply('you reacted with a thumbs down.');
+                        }
+                    })
+                    .catch(collected => {
+                        console.log(`After a minute, only ${collected.size} out of 4 reacted.`);
+                        message.reply('you didn\'t react with neither a thumbs up, nor a thumbs down.');
+                    });
+
+
                 aMessage = message;
                 let applicationEmbed = new Discord.RichEmbed()
                 .setColor("#3fc627")

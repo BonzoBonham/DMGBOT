@@ -170,11 +170,11 @@ const handleMessage = (message) => {
       } else {
         message.author.send ("Thanks for your application! You must add a reason for it, type it now!");
 
-        const collector = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 10000 });
+        const collector = new Discord.MessageCollector(message.author.dmChannel , m => m.author.id === message.author.id, { time: 10000 });
         console.log(collector)
         collector.on('collect', message => {
             if (message.content.length <= 10) {
-                message.author.send("Your application message should be longer than 10 characters!");
+                message.author.send("Your application message should be longer than 10 characters! Type !apply to try again.");
             } else {
                 aMessage = message;
                 let applicationEmbed = new Discord.RichEmbed()
@@ -188,7 +188,7 @@ const handleMessage = (message) => {
                   embedMessage.react("👍").then(() => embedMessage.react('👎'))
                 }).catch(() => console.error('One of the emojis failed to react.'));
 
-                
+
                 message.author.send("Thanks! I will send your application to the staff team! Give us a week to look over it and we will get back to you!");
             }
         })

@@ -177,10 +177,8 @@ const handleMessage = (message) => {
                 message.author.send("Your application message should be longer than 10 characters! Type !apply to try");
             } else {
                 message.author.send("Are you sure you want that to be your application message? Confirm or deny with the reactions!");
-
-
-                /*message.react('👍').then(() => message.react('👎'));
-
+                message.react('👍').then(() => message.react('👎'));
+                /*
                 const filter = (reaction, user) => {
                     return ['👍', '👎'].includes(reaction.emoji.name) && user.id === message.author.id;
                 };

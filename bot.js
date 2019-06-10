@@ -206,7 +206,7 @@ const handleMessage = (message) => {
                 .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)
                 .setDescription("Vote with reactions!");
 
-                message.delete().catch(O_o => {console.log("Failed to delete message!")});
+                //message.delete().catch(O_o => {console.log("Failed to delete message!")});
                 bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed)
                 .then(embedMessage => {
                   embedMessage.react("👍").then(() => embedMessage.react('👎'))

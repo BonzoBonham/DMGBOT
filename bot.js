@@ -178,20 +178,21 @@ const handleMessage = (message) => {
             } else {
                 message.author.send("Are you sure you want that to be your application message? Confirm or deny with the reactions!");
                 message.react('👍').then(() => message.react('👎'));
-                /*
+                
                 const filter = (reaction, user) => {
                     return ['👍', '👎'].includes(reaction.emoji.name) && user.id === message.author.id;
                 };
 
+                
                 message.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] })
                     .then(collected => {
                         const reaction = collected.first();
 
                         if (reaction.emoji.name === '👍') {
-                            message.reply('you reacted with a thumbs up.');
+                            message.author.send("nice thumbs up")
                         }
                         else {
-                            message.reply('you reacted with a thumbs down.');
+                            message.author.send('you reacted with a thumbs down.');
                         }
                     })
                     .catch(collected => {
@@ -199,7 +200,6 @@ const handleMessage = (message) => {
                         message.reply('you didn\'t react with neither a thumbs up, nor a thumbs down.');
                     });
 
-                */
                 aMessage = message;
                 let applicationEmbed = new Discord.RichEmbed()
                 .setColor("#3fc627")

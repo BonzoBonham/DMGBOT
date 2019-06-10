@@ -168,15 +168,15 @@ const handleMessage = (message) => {
         message.channel.send ("Permission denied! Only detectives can apply to be staff!");
         return;
       } else {
-        message.author.send ("Thanks for your application! You must add a reason for it, type it now in the channel you first typed !apply on.");
+        message.reply("Thanks for your application! You must add a reason for it, type it now in the channel you first typed !apply on.");
 
-        const collector = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 10000 });
+        const collector = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 60000 });
         console.log(collector)
         collector.on('collect', message => {
             if (message.content.length <= 10) {
-                message.author.send("Your application message should be longer than 10 characters! Type !apply to try");
+                message.reply("Your application message should be longer than 10 characters! Try again.");
             } else {
-                message.author.send("Are you sure you want that to be your application message? Confirm or deny with the reactions!");
+                message.reply("Are you sure you want that to be your application message? Confirm or deny with the reactions!");
                 message.react('👍').then(() => message.react('👎'));
                 
                 const filter = (reaction, user) => {
@@ -200,16 +200,14 @@ const handleMessage = (message) => {
                           .then(embedMessage => {
                             embedMessage.react("👍").then(() => embedMessage.react('👎'))
                           }).catch(() => console.error('One of the emojis failed to react.'));
-                          message.author.send("Thanks! I will send your application to the staff team! Give us a week to look over it and we will get back to you!");
-
+                          message.reply("Thanks! I will send your application to the staff team! Give us a week to look over it and we will get back to you!");
                         }
                         else {
-                          message.author.send("Oh, ok! You can try again any time with !apply");
+                          message.reply("Oh, OK! You can try again any time with !apply.");
                         }
                     })
                     .catch(collected => {
-                        console.log(`After a minute, only ${collected.size} out of 4 reacted.`);
-                        message.reply('you didn\'t react with neither a thumbs up, nor a thumbs down.');
+                        message.reply('You didn\'t react with neither a thumbs up, nor a thumbs down. Try again!');
                     });
             }
         })

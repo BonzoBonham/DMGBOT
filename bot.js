@@ -189,37 +189,30 @@ const handleMessage = (message) => {
                         const reaction = collected.first();
 
                         if (reaction.emoji.name === '👍') {
-                            message.author.send("nice thumbs up")
+                          aMessage = message;
+                          let applicationEmbed = new Discord.RichEmbed()
+                          .setColor("#3fc627")
+                          .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)
+                          .setDescription("Vote with reactions!");
+          
+                          //message.delete().catch(O_o => {console.log("Failed to delete message!")});
+                          bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed)
+                          .then(embedMessage => {
+                            embedMessage.react("👍").then(() => embedMessage.react('👎'))
+                          }).catch(() => console.error('One of the emojis failed to react.'));
+                          message.author.send("Thanks! I will send your application to the staff team! Give us a week to look over it and we will get back to you!");
+
                         }
                         else {
-                            message.author.send('you reacted with a thumbs down.');
+                          message.author.send("Oh, ok! You can try again any time with !apply");
                         }
                     })
                     .catch(collected => {
                         console.log(`After a minute, only ${collected.size} out of 4 reacted.`);
                         message.reply('you didn\'t react with neither a thumbs up, nor a thumbs down.');
                     });
-
-                aMessage = message;
-                let applicationEmbed = new Discord.RichEmbed()
-                .setColor("#3fc627")
-                .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)
-                .setDescription("Vote with reactions!");
-
-                //message.delete().catch(O_o => {console.log("Failed to delete message!")});
-                bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed)
-                .then(embedMessage => {
-                  embedMessage.react("👍").then(() => embedMessage.react('👎'))
-                }).catch(() => console.error('One of the emojis failed to react.'));
-
-
-                message.author.send("Thanks! I will send your application to the staff team! Give us a week to look over it and we will get back to you!");
             }
         })
-
-
-     
-
         return;
       }
     }

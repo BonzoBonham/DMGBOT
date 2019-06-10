@@ -181,16 +181,20 @@ const handleMessage = (message) => {
                 .setColor("#3fc627")
                 .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)
                 .setDescription("Vote with reactions!");
+
+                message.delete().catch(O_o => {console.log("Failed to delete message!")});
+                bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed)
+                .then(embedMessage => {
+                  embedMessage.react("👍").then(() => embedMessage.react('👎'))
+                }).catch(() => console.error('One of the emojis failed to react.'));
+
+                
                 message.author.send("Thanks! I will send your application to the staff team! Give us a week to look over it and we will get back to you!");
             }
         })
 
 
-        message.delete().catch(O_o => {console.log("Failed to delete message!")});
-        bot.channels.get(APPLICATION_CHANNEL).send(applicationEmbed)
-        .then(embedMessage => {
-          embedMessage.react("👍").then(() => embedMessage.react('👎'))
-        }).catch(() => console.error('One of the emojis failed to react.'));
+     
 
         return;
       }

@@ -110,7 +110,8 @@ const handleMessage = (message) => {
 
     // Allow l/u-case commands. Return an error if the command is invalid
     if (!Object.values(MESSAGE_CODES).map((code) => prefix + code.toLowerCase()).find((code) => code === cmd.toLowerCase())) {
-      message.channel.send("Sorry! We didn't recognize that command.");
+      console.log("Sorry! We didn't recognize that command.");
+      //message.channel.send("Sorry! We didn't recognize that command.");
     };
 
     //bot command that returns bot info
@@ -165,12 +166,24 @@ const handleMessage = (message) => {
       }
       if (!isDetective){
         message.channel.send ("Permission denied! Only detectives can apply to be staff!");
+        return;
       } else {
-        message.author.send ("Thanks for your application! Give us a week to look over it, and we'll get back to you!");
-        let applicationEmbed = new Discord.RichEmbed()
-        .setColor("#3fc627")
-        .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)
-        .setDescription("Vote with reactions!");
+        message.author.send ("Thanks for your application! You must add a reason for it, type it now!");
+
+        const collector = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 10000 });
+        console.log(collector)
+        collector.on('collect', message => {
+            if (message.content.length <= 10) {
+                message.author.send("Your application message should be longer than 10 characters!");
+            } else {
+                aMessage = message;
+                let applicationEmbed = new Discord.RichEmbed()
+                .setColor("#3fc627")
+                .addField(`${aUser} has applied to be a DMG staff member!`, `Application message: ${aMessage}`)
+                .setDescription("Vote with reactions!");
+                message.author.send("Thanks! I will send your application to the staff team! Give us a week to look over it and we will get back to you!");
+            }
+        })
 
 
         message.delete().catch(O_o => {console.log("Failed to delete message!")});

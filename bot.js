@@ -92,7 +92,7 @@ const voicechannelupdate = () =>
 //Function called every 30000 ms to update the title of the voice channel with the POTPOURRI server status
 const potvoicechannelupdate = () =>
     //Server status query
-    handleGamedigPotQuery().then((state) => {
+    handlePotGamedigQuery().then((state) => {
         var status = state.players.length + " in " + state.map;
         let statuschannel = bot.channels.get(POT_VOICE_CHANNEL);
         statuschannel.setName(status);

@@ -1,4 +1,4 @@
-const { prefix, token, gamedigConfig, channels } = require("./botconfig.json");
+const { prefix, token, gamedigConfig, gamedigPotConfig, channels } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const fs = require('fs');
@@ -8,13 +8,17 @@ let appstatus = true;
 const TEXT_CHANNEL =  channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
 const APPLICATION_CHANNEL = channels.APPLICATION;
+const POT_TEXT_CHANNEL = channels.POTTEXT;
+const POT_VOICE_CHANNEL = channels.POTVOICE;
 
 const DEFAULT_UPDATE_INTERVAL = 30000; // Thirty seconds
 
 //Message codes for the bot functions
 const MESSAGE_CODES = {
-    "PLAYERS": "players",
-    "INVITE": "invite",
+    "PLAYERS": "tttplayers",
+    "POTPLAYERS": "potplayers",
+    "INVITE": "tttinvite",
+    "POTINVITE": "potinvite",
     "BOT_INFO": "botinfo",
     "APPLY": "apply",
     "CHANGE_APPLICATION": "apps" 
@@ -43,7 +47,15 @@ const handleGamedigQuery = () =>
   new Promise((resolve) => {
     return Gamedig.query(gamedigConfig)
       .then(resolve)
-      .catch((error) => { console.log("Server is offline"); })
+      .catch((error) => { console.log("TTT Server is offline"); })
+  });
+
+// handle potpourri querry to gamedig
+const handlePotGamedigQuery = () =>
+  new Promise((resolve) => {
+    return Gamedig.query(gamedigPotConfig)
+      .then(resolve)
+      .catch((error) => { console.log("Potpourri Server is offline"); })
   });
 
 //Function called every 30000 ms to update the "game" played by the bot

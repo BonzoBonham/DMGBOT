@@ -139,14 +139,14 @@ const pottextchannelupdate = (message, channel) =>
 
           // Ensure we obtain the first message sent with the startup-message
           let sortedMessages = [...messages].sort((fm, sm) => fm[0] - sm[0]).map((msg) => msg[1])
-            .filter(({author, content}) => content.includes(POT_STARTUP_MESSAGE_PLAYERS_KEY) && author.bot)
+            .filter(({author, content}) => content.includes(STARTUP_MESSAGE_PLAYERS_KEY) && author.bot)
 
           let lastMessage =  sortedMessages[sortedMessages.length - 1];
 
           // If the startup message is not in the list, send the message. Otherwise edit it.
           return (!lastMessage)
             ? channel.send(message + "\n" + players)
-            : lastMessage.edit(STARTUP_MESSAGE + "\n" + players)
+            : lastMessage.edit(POT_STARTUP_MESSAGE + "\n" + players)
         });
 
     }).catch(console.error);

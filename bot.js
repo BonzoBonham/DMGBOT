@@ -300,7 +300,7 @@ bot.on("ready", () => {
 
   bot.setInterval(activityupdate,DEFAULT_UPDATE_INTERVAL);
   bot.setInterval(voicechannelupdate,DEFAULT_UPDATE_INTERVAL);
-  bot.setPotInterval(potvoicechannelupdate,DEFAULT_UPDATE_INTERVAL);
+  bot.setInterval(potvoicechannelupdate,DEFAULT_UPDATE_INTERVAL);
 
   // After we send the first text-status message, set the loop.
   updateTextChannel()

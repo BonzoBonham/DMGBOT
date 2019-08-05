@@ -1,4 +1,4 @@
-const { prefix, token, gamedigConfig, channels } = require("./botconfig.json");
+const { prefix, token, gamedigConfig, gamedigPotConfig, channels } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require('gamedig');
 const fs = require('fs');
@@ -8,13 +8,17 @@ let appstatus = true;
 const TEXT_CHANNEL =  channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
 const APPLICATION_CHANNEL = channels.APPLICATION;
+const POT_TEXT_CHANNEL = channels.POTTEXT;
+const POT_VOICE_CHANNEL = channels.POTVOICE;
 
 const DEFAULT_UPDATE_INTERVAL = 30000; // Thirty seconds
 
 //Message codes for the bot functions
 const MESSAGE_CODES = {
-    "PLAYERS": "players",
-    "INVITE": "invite",
+    "PLAYERS": "tttplayers",
+    "POTPLAYERS": "potplayers",
+    "INVITE": "tttinvite",
+    "POTINVITE": "potinvite",
     "BOT_INFO": "botinfo",
     "APPLY": "apply",
     "CHANGE_APPLICATION": "apps" 
@@ -43,13 +47,20 @@ const handleGamedigQuery = () =>
   new Promise((resolve) => {
     return Gamedig.query(gamedigConfig)
       .then(resolve)
-      .catch((error) => { console.log("Server is offline"); })
+      .catch((error) => { console.log("TTT Server is offline"); })
+  });
+
+// handle potpourri querry to gamedig
+const handlePotGamedigQuery = () =>
+  new Promise((resolve) => {
+    return Gamedig.query(gamedigPotConfig)
+      .then(resolve)
+      .catch((error) => { console.log("Potpourri Server is offline"); })
   });
 
 //Function called every 30000 ms to update the "game" played by the bot
 const activityupdate = () =>
     handleGamedigQuery().then((state) => {
-
         var status = state.players.length + " in " + state.map;
         bot.user.setActivity(status, { type: 'PLAYING' })
         console.log("Bot activity status updated!")
@@ -57,7 +68,13 @@ const activityupdate = () =>
 
 // Will return a list of all active players by-name joined by the specified delimiter
 const getActivePlayers = (delimiter = ", \n") =>
-  handleGamedigQuery().then((state) => {
+    handleGamedigQuery().then((state) => {
+      return Promise.resolve(state.players.length ? state.players.map((ply) => ply.name).join(delimiter) : "");
+  }).catch(console.error);
+
+// Will return potpourri's players by name.
+const getPotActivePlayers = (delimiter = ", \n") =>
+    handlePotGamedigQuery().then((state) => {
       return Promise.resolve(state.players.length ? state.players.map((ply) => ply.name).join(delimiter) : "");
   }).catch(console.error);
 
@@ -68,13 +85,47 @@ const voicechannelupdate = () =>
         var status = state.players.length + " in " + state.map;
         let statuschannel = bot.channels.get(VOICE_CHANNEL);
         statuschannel.setName(status);
-        console.log("Status updated!");
+        console.log("TTT status updated!");
+        Promise.resolve();
+    }).catch(console.error);
+
+//Function called every 30000 ms to update the title of the voice channel with the POTPOURRI server status
+const potvoicechannelupdate = () =>
+    //Server status query
+    handleGamedigPotQuery().then((state) => {
+        var status = state.players.length + " in " + state.map;
+        let statuschannel = bot.channels.get(POT_VOICE_CHANNEL);
+        statuschannel.setName(status);
+        console.log("Potpourri status updated!");
         Promise.resolve();
     }).catch(console.error);
 
 //Function called every 30000ms to update the playerlist in the player list channel
 const textchannelupdate = (message, channel) =>
   getActivePlayers()
+    .then((players) => {
+
+      return channel.fetchMessages().then((messages) => {
+
+          players = (players.length ? players : "----***There are no players online right now, be the first to join!***----");
+
+          // Ensure we obtain the first message sent with the startup-message
+          let sortedMessages = [...messages].sort((fm, sm) => fm[0] - sm[0]).map((msg) => msg[1])
+            .filter(({author, content}) => content.includes(STARTUP_MESSAGE_PLAYERS_KEY) && author.bot)
+
+          let lastMessage =  sortedMessages[sortedMessages.length - 1];
+
+          // If the startup message is not in the list, send the message. Otherwise edit it.
+          return (!lastMessage)
+            ? channel.send(message + "\n" + players)
+            : lastMessage.edit(STARTUP_MESSAGE + "\n" + players)
+        });
+
+    }).catch(console.error);
+
+//Function called every 30000ms to update the POTPOURRI playerlist in the POT player list channel
+const pottextchannelupdate = (message, channel) =>
+  getPotActivePlayers()
     .then((players) => {
 
       return channel.fetchMessages().then((messages) => {
@@ -117,7 +168,7 @@ const handleMessage = (message) => {
     //bot command that returns bot info
     if (cmd === `${prefix}${MESSAGE_CODES.BOT_INFO}`){
         message.channel.send("I was made by Bonzo and John, for the DMG Discord server!");
-    }
+    };
 
     //bot command that returns amount of online players and map being played
     if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`){
@@ -127,7 +178,18 @@ const handleMessage = (message) => {
             + "Come join us! " + STEAM_SERVER_LINK);
             return Promise.resolve();
         }).catch(console.error);
-    }
+    };
+
+    //Command for Potpourri invite
+    if (cmd === `${prefix}${MESSAGE_CODES.POTINVITE}`){
+      handleGamedigPotQuery().then((state) => {
+          message.channel.send("The server has " + state.players.length + " players on right now.\n"
+          + "The server is on the map " + state.map + " right now.\n"
+          + "Come join us! " + STEAM_SERVER_LINK);
+          return Promise.resolve();
+      }).catch(console.error);
+    };
+
 
     //bot command that changes the status for recieving applications
     if (cmd === `${prefix}${MESSAGE_CODES.CHANGE_APPLICATION}`){
@@ -147,6 +209,15 @@ const handleMessage = (message) => {
     //bot command that returns the names of every online player
     if (cmd === `${prefix}${MESSAGE_CODES.PLAYERS}`){
       getActivePlayers()
+        .then((players) => {
+          message.author.send("Player List: " + (players.length ? players : "No online players."))
+          message.channel.send ("Check your DM's for a list of online players!");
+        })
+    }
+
+    //bot command that returns the names of every online player
+    if (cmd === `${prefix}${MESSAGE_CODES.POTPLAYERS}`){
+      getPotActivePlayers()
         .then((players) => {
           message.author.send("Player List: " + (players.length ? players : "No online players."))
           message.channel.send ("Check your DM's for a list of online players!");
@@ -220,6 +291,7 @@ const handleMessage = (message) => {
 // Create a function-wrapper for the interval function to avoid duplicity.
 // We also want to call it once on startup.
 const updateTextChannel = () => textchannelupdate(STARTUP_MESSAGE, bot.channels.get(TEXT_CHANNEL));
+const updatePotTextChannel = () => pottextchannelupdate(STARTUP_MESSAGE, bot.channels.get(POT_TEXT_CHANNEL));
 
 //Sets the "game" being played by the bot every 30 seconds
 bot.on("ready", () => {
@@ -228,10 +300,13 @@ bot.on("ready", () => {
 
   bot.setInterval(activityupdate,DEFAULT_UPDATE_INTERVAL);
   bot.setInterval(voicechannelupdate,DEFAULT_UPDATE_INTERVAL);
+  bot.setPotInterval(potvoicechannelupdate,DEFAULT_UPDATE_INTERVAL);
 
   // After we send the first text-status message, set the loop.
   updateTextChannel()
     .then(() => { bot.setInterval(updateTextChannel,DEFAULT_UPDATE_INTERVAL); });
+  updatePotTextChannel()
+    .then(() => { bot.setPotInterval(updatePotTextChannel,DEFAULT_UPDATE_INTERVAL); });
 
 });
 

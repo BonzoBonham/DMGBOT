@@ -4,10 +4,16 @@
 	    "type": "garrysmod",
 	    "host": "66.151.244.2"
 	},
+	"gamedigPotConfig" : {
+		"type": "garrysmod",
+	    "host": "<<<<PLACEHOLDER>>>>>"
+	},
 	"channels": {
 		"TEXT": "573022289931796511",
 		"VOICE": "573022265416089603",
-		"APPLICATION": "578013891523510283"
+		"APPLICATION": "578013891523510283",
+		"POTTEXT": "607896977270898689",
+		"POTVOICE": "607897137468145674"
 	},
 	"token": null
 }

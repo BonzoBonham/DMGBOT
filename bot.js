@@ -24,11 +24,16 @@ const MESSAGE_CODES = {
     "CHANGE_APPLICATION": "apps" 
   };
 
+const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
 const STEAM_SERVER_LINK = "steam://connect/66.151.244.2:27015";
 const STARTUP_MESSAGE_PLAYERS_KEY = "**ONLINE PLAYERS**";
 const STARTUP_MESSAGE = `
 ***Click this link to open up Garry's Mod and connect to the server!***
 ------------- ***` + STEAM_SERVER_LINK + `*** ---------------
+--------------------------` + STARTUP_MESSAGE_PLAYERS_KEY + `---------------------------`;
+const POT_STARTUP_MESSAGE = `
+***Click this link to open up Garry's Mod and connect to the server!***
+------------- ***` + POT_STEAM_SERVER_LINK + `*** ---------------
 --------------------------` + STARTUP_MESSAGE_PLAYERS_KEY + `---------------------------`;
 
 // Handle potential uncaught errors resulting from dependencies.
@@ -134,7 +139,7 @@ const pottextchannelupdate = (message, channel) =>
 
           // Ensure we obtain the first message sent with the startup-message
           let sortedMessages = [...messages].sort((fm, sm) => fm[0] - sm[0]).map((msg) => msg[1])
-            .filter(({author, content}) => content.includes(STARTUP_MESSAGE_PLAYERS_KEY) && author.bot)
+            .filter(({author, content}) => content.includes(POT_STARTUP_MESSAGE_PLAYERS_KEY) && author.bot)
 
           let lastMessage =  sortedMessages[sortedMessages.length - 1];
 
@@ -182,10 +187,10 @@ const handleMessage = (message) => {
 
     //Command for Potpourri invite
     if (cmd === `${prefix}${MESSAGE_CODES.POTINVITE}`){
-      handleGamedigPotQuery().then((state) => {
+      handlePotGamedigQuery().then((state) => {
           message.channel.send("The server has " + state.players.length + " players on right now.\n"
           + "The server is on the map " + state.map + " right now.\n"
-          + "Come join us! " + STEAM_SERVER_LINK);
+          + "Come join us! " + POT_STEAM_SERVER_LINK);
           return Promise.resolve();
       }).catch(console.error);
     };
@@ -291,7 +296,7 @@ const handleMessage = (message) => {
 // Create a function-wrapper for the interval function to avoid duplicity.
 // We also want to call it once on startup.
 const updateTextChannel = () => textchannelupdate(STARTUP_MESSAGE, bot.channels.get(TEXT_CHANNEL));
-const updatePotTextChannel = () => pottextchannelupdate(STARTUP_MESSAGE, bot.channels.get(POT_TEXT_CHANNEL));
+const updatePotTextChannel = () => pottextchannelupdate(POT_STARTUP_MESSAGE, bot.channels.get(POT_TEXT_CHANNEL));
 
 //Sets the "game" being played by the bot every 30 seconds
 bot.on("ready", () => {

@@ -6,7 +6,7 @@
 	},
 	"gamedigPotConfig" : {
 		"type": "garrysmod",
-	    "host": "<<<<PLACEHOLDER>>>>>"
+	   	"host": "192.223.27.68:27015"
 	},
 	"channels": {
 		"TEXT": "573022289931796511",

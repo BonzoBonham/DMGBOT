@@ -306,7 +306,7 @@ bot.on("ready", () => {
   updateTextChannel()
     .then(() => { bot.setInterval(updateTextChannel,DEFAULT_UPDATE_INTERVAL); });
   updatePotTextChannel()
-    .then(() => { bot.setPotInterval(updatePotTextChannel,DEFAULT_UPDATE_INTERVAL); });
+    .then(() => { bot.setInterval(updatePotTextChannel,DEFAULT_UPDATE_INTERVAL); });
 
 });
 

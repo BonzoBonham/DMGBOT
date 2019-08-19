@@ -94,7 +94,7 @@ const handlePotGamedigQuery = () =>
 const activityupdate = () =>
   handleGamedigQuery().then(state => {
     var status = state.players.length + " in " + state.map;
-    bot.user.setActivity(status, { type: "PLAYING" });
+    bot.user.setActivity("!help", { type: "PLAYING" });
     console.log("Bot activity status updated!");
   });
 

@@ -27,7 +27,8 @@ const MESSAGE_CODES = {
   POTINVITE: "potinvite",
   BOT_INFO: "botinfo",
   APPLY: "apply",
-  CHANGE_APPLICATION: "apps"
+  CHANGE_APPLICATION: "apps",
+  HELP: "help"
 };
 
 const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
@@ -209,9 +210,8 @@ const handleMessage = message => {
     message === undefined || // Message must exist
     message.author.bot || // Message must not be from the bot
     message.channel.type === "dm" || // message must not be a dm
-    message.content[0] !== prefix
+    message.content[0] !== prefix // Message must contain the assumed prefix
   )
-    // Message must contain the assumed prefix
     return;
 
   let messageArray = message.content.split(" ");
@@ -252,6 +252,14 @@ const handleMessage = message => {
         return Promise.resolve();
       })
       .catch(console.error);
+  }
+
+  //Command to DM player list of bot commands
+  if (cmd === `${prefix}${MESSAGE_CODES.HELP}`) {
+    message.author.send(`Here's the list of commands for the server!
+    
+    ***!tttinvite:*** Announces current player count and map in the TTT server, along with a direct invite link.
+    ***!potinvite:*** Announces current player count and map in the Potpourri server, along with a direct invite link.`);
   }
 
   //Command for Potpourri invite

@@ -256,10 +256,20 @@ const handleMessage = message => {
 
   //Command to DM player list of bot commands
   if (cmd === `${prefix}${MESSAGE_CODES.HELP}`) {
-    message.author.send(`Here's the list of commands for the server!
+    message.author
+      .send(`The server status is displayed throught the voice and text channels in the servers section of the discord.
+The current map and player count is displayed in the respective voice channel, while the player names and a direct invite link is shown in the text channel.
     
-    ***!tttinvite:*** Announces current player count and map in the TTT server, along with a direct invite link.
-    ***!potinvite:*** Announces current player count and map in the Potpourri server, along with a direct invite link.`);
+Here's the list of commands for the server!    
+
+***!tttinvite:*** Announces current player count and map in the TTT server, along with a direct invite link.
+***!potinvite:*** Announces current player count and map in the Potpourri server, along with a direct invite link.
+***!apply <reason>:*** Use this command to apply for a staff position. Replace <reason> with your own reason for joining the staff team. Follow my commands to send your application. (Detectives only!)
+***!tttplayers:*** DM's you the list of the current TTT players.
+***!potplayers:*** DM's you the list of the current Potpourri players.
+***!help:*** DM's you this help message again.
+***!apps:*** Enable or disable the !apply command (Community Managers only!) 
+***!botinfo:*** Display the credits.`);
   }
 
   //Command for Potpourri invite

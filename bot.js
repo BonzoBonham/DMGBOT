@@ -242,7 +242,7 @@ const handleMessage = message => {
   if (cmd === `${prefix}${MESSAGE_CODES.MUTE}`) {
 
     message.channel.send("muting...")
-    if (args.length() != 1) {
+    if (args.length != 1) {
       message.channel.send("Invalid Arguments!");
       return;
     }

@@ -241,6 +241,7 @@ const handleMessage = message => {
   //bot command that mutes people lmao
   if (cmd === `${prefix}${MESSAGE_CODES.MUTE}`) {
 
+    message.channel.send("muting...")
     if (args.length() != 1) {
       message.channel.send("Invalid Arguments!");
       return;

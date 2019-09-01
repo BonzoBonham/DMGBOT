@@ -256,7 +256,9 @@ const handleMessage = message => {
       return;
     }
 
-    guild.channels.filter(e => e.type !== 'voice').forEach(channel => {
+    let Guild = message.guild;
+
+    Guild.channels.filter(e => e.type !== 'voice').forEach(channel => {
       channel.overwritePermissions(user, {
         SEND_MESSAGES: false
       })

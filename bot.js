@@ -260,6 +260,7 @@ const handleMessage = message => {
         SEND_MESSAGES: false
       })
     })
+    message.channel.send(user + " Muted!")
 
   }
 

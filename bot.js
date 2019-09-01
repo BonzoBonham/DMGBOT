@@ -10,6 +10,7 @@ const Gamedig = require("gamedig");
 const fs = require("fs");
 const bot = new Discord.Client({ disableEveryone: true });
 
+
 let appstatus = true;
 const TEXT_CHANNEL = channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
@@ -28,7 +29,9 @@ const MESSAGE_CODES = {
   BOT_INFO: "botinfo",
   APPLY: "apply",
   CHANGE_APPLICATION: "apps",
-  HELP: "help"
+  HELP: "help",
+  MUTE: "mute",
+  UNMUTE: "unmute"
 };
 
 const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
@@ -54,7 +57,7 @@ const POT_STARTUP_MESSAGE =
   `---------------------------`;
 
 // Handle potential uncaught errors resulting from dependencies.
-process.on("unhandledRejection", function(err, promise) {
+process.on("unhandledRejection", function (err, promise) {
   // ignore improperly-chained promise rejections from Sequential.js
   if (err.stack.includes("Sequential.js:79:15")) {
     return;
@@ -235,19 +238,45 @@ const handleMessage = message => {
     );
   }
 
+  //bot command that mutes people lmao
+  if (cmd === `${prefix}${MESSAGE_CODES.MUTE}`) {
+
+    if (args.length() != 1) {
+      message.channel.send("Invalid Arguments!");
+      return;
+    }
+    let user = args[0];
+
+    //USER MUST BE COMMUNITY MANAGER OR DISCORD MOD TO MUTE
+    let isCM = message.member.roles.find(r => r.name === "Community Manager"); //user using !apps must be community manager
+    let isDiscordMod = message.member.roles.find(r => r.name === "Discord Moderator"); //applying user must be detective 
+    if (!isCM && !isDiscordMod) {
+      message.channel.send("Permission denied!");
+      return;
+    }
+
+    guild.channels.filter(e => e.type !== 'voice').forEach(channel => {
+      channel.overwritePermissions(user, {
+        SEND_MESSAGES: false
+      })
+    })
+
+  }
+
+
   //bot command that returns amount of online players and map being played
   if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`) {
     handleGamedigQuery()
       .then(state => {
         message.channel.send(
           "The server has " +
-            state.players.length +
-            " players on right now.\n" +
-            "The server is on the map " +
-            state.map +
-            " right now.\n" +
-            "Come join us! " +
-            STEAM_SERVER_LINK
+          state.players.length +
+          " players on right now.\n" +
+          "The server is on the map " +
+          state.map +
+          " right now.\n" +
+          "Come join us! " +
+          STEAM_SERVER_LINK
         );
         return Promise.resolve();
       })
@@ -278,13 +307,13 @@ Here's the list of commands for the server!
       .then(state => {
         message.channel.send(
           "The server has " +
-            state.players.length +
-            " players on right now.\n" +
-            "The server is on the map " +
-            state.map +
-            " right now.\n" +
-            "Come join us! " +
-            POT_STEAM_SERVER_LINK
+          state.players.length +
+          " players on right now.\n" +
+          "The server is on the map " +
+          state.map +
+          " right now.\n" +
+          "Come join us! " +
+          POT_STEAM_SERVER_LINK
         );
         return Promise.resolve();
       })

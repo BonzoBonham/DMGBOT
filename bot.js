@@ -275,7 +275,7 @@ const handleMessage = message => {
     handleGamedigQuery()
       .then(state => {
         message.channel.send(
-          `<@644704497150590997> ` +
+          "<@644704497150590997> \n" +
           "The server has " +
           state.players.length +
           " players on right now.\n" +

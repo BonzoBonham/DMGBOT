@@ -31,7 +31,7 @@ const MESSAGE_CODES = {
   CHANGE_APPLICATION: "apps",
   HELP: "help",
   MUTE: "mute",
-  UNMUTE: "unmute"
+  UNMUTE: "unmute",
   TTTTIME: "ttttime"
 };
 

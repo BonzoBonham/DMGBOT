@@ -32,6 +32,7 @@ const MESSAGE_CODES = {
   HELP: "help",
   MUTE: "mute",
   UNMUTE: "unmute"
+  TTTTIME: "ttttime"
 };
 
 const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
@@ -84,14 +85,15 @@ const handleGamedigQuery = () =>
   });
 
 // handle potpourri querry to gamedig
-const handlePotGamedigQuery = () =>
-  new Promise(resolve => {
-    return Gamedig.query(gamedigPotConfig)
+const handlePotGamedigQuery = () => {
+  return new Promise(resolve => {
+    Gamedig.query(gamedigPotConfig)
       .then(resolve)
       .catch(error => {
         console.log("Potpourri Server is offline");
       });
   });
+}
 
 //Function called every 30000 ms to update the "game" played by the bot
 const activityupdate = () =>
@@ -273,6 +275,7 @@ const handleMessage = message => {
     handleGamedigQuery()
       .then(state => {
         message.channel.send(
+          "@644704497150590997 " +
           "The server has " +
           state.players.length +
           " players on right now.\n" +
@@ -322,6 +325,27 @@ Here's the list of commands for the server!
         return Promise.resolve();
       })
       .catch(console.error);
+  }
+
+  //bot command to toggle ttt time role
+  if (cmd === `${prefix}${MESSAGE_CODES.TTTTIME}`) {
+    let user = message.member
+    let isTTT = user.roles.find(r => r.name === "Community Manager"); //check if user has ttt time role
+
+    if (!isTTT) {
+      user.addRole('644704497150590997')
+        .then(() => {
+          console.log("TTT Time role successfully added to " + user.nickname)
+          message.author.send("You're all set! You will now be mentioned whenever someones uses the !tttinvite command. You can disable this anytime by using the !ttttime command again!")
+        });
+    } else {
+      user.removeRole('644704497150590997')
+        .then(() => {
+          console.log("TTT Time role successfully added to " + user.nickname)
+          message.author.send("Alright, I have removed the TTT Time role from you. You won't be mentioned again.")
+        });
+    }
+
   }
 
   //bot command that changes the status for recieving applications

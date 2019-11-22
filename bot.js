@@ -306,6 +306,7 @@ Here's the list of commands for the server!
 ***!help:*** DM's you this help message again.
 ***!apps:*** Enable or disable the !apply command (Community Managers only!) 
 ***!botinfo:*** Display the credits.`);
+
   }
 
   //Command for Potpourri invite

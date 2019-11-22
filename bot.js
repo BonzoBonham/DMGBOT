@@ -275,7 +275,7 @@ const handleMessage = message => {
     handleGamedigQuery()
       .then(state => {
         message.channel.send(
-          "@644704497150590997 " +
+          `@644704497150590997 ` +
           "The server has " +
           state.players.length +
           " players on right now.\n" +
@@ -331,7 +331,7 @@ Here's the list of commands for the server!
   //bot command to toggle ttt time role
   if (cmd === `${prefix}${MESSAGE_CODES.TTTTIME}`) {
     let user = message.member
-    let isTTT = user.roles.find(r => r.name === "Community Manager"); //check if user has ttt time role
+    let isTTT = user.roles.find(r => r.name === "TTT Time"); //check if user has ttt time role
 
     if (!isTTT) {
       user.addRole('644704497150590997')

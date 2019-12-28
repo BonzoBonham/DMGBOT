@@ -361,7 +361,7 @@ Here's the list of commands for the server!
   }
 
   //bot command to invite people to play some halo 8)
-  if (cmd === `${prefix}${MESSAGE_CODES.HALOTIME}`) {
+  if (cmd === `${prefix}${MESSAGE_CODES.HALOINVITE}`) {
     message.channel.send(
       "<@&660591794882478112> \n" +
       "Time to play some Halo!");

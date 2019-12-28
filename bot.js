@@ -34,7 +34,9 @@ const MESSAGE_CODES = {
   UNMUTE: "unmute",
   TTTTIME: "ttttime",
   JACKTIME: "jacktime",
-  JACKINVITE: "jackinvite"
+  JACKINVITE: "jackinvite",
+  HALOTIME: "halotime",
+  HALOINVITE: "haloinvite"
 };
 
 const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
@@ -358,6 +360,13 @@ Here's the list of commands for the server!
       "Time to play some Jackbox!");
   }
 
+  //bot command to invite people to play some halo 8)
+  if (cmd === `${prefix}${MESSAGE_CODES.HALOTIME}`) {
+    message.channel.send(
+      "<@&660591794882478112> \n" +
+      "Time to play some Halo!");
+  }
+
   //bot command to toggle jackbox time role
   if (cmd === `${prefix}${MESSAGE_CODES.JACKTIME}`) {
     let user = message.member
@@ -376,7 +385,26 @@ Here's the list of commands for the server!
           message.author.send("Alright, I have removed the Jackbox Time role from you. You won't be mentioned again.")
         });
     }
+  }
 
+  //bot command to toggle halo time role
+  if (cmd === `${prefix}${MESSAGE_CODES.HALOTIME}`) {
+    let user = message.member
+    let isHalo = user.roles.find(r => r.name === "Halo Time"); //check if user has jackbox time role
+
+    if (!isHalo) {
+      user.addRole('660591794882478112')
+        .then(() => {
+          console.log("Halo Time role successfully added to " + user.nickname)
+          message.author.send("You're all set! You will now be mentioned whenever someones uses the !haloinvite command. You can disable this anytime by using the !halotime command again!")
+        });
+    } else {
+      user.removeRole('660591794882478112')
+        .then(() => {
+          console.log("Halo Time role successfully removed from " + user.nickname)
+          message.author.send("Alright, I have removed the Halo Time role from you. You won't be mentioned again.")
+        });
+    }
   }
 
   //bot command that changes the status for recieving applications

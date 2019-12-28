@@ -32,7 +32,9 @@ const MESSAGE_CODES = {
   HELP: "help",
   MUTE: "mute",
   UNMUTE: "unmute",
-  TTTTIME: "ttttime"
+  TTTTIME: "ttttime",
+  JACKTIME: "jacktime",
+  JACKINVITE: "jackinvite"
 };
 
 const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
@@ -344,6 +346,34 @@ Here's the list of commands for the server!
         .then(() => {
           console.log("TTT Time role successfully added to " + user.nickname)
           message.author.send("Alright, I have removed the TTT Time role from you. You won't be mentioned again.")
+        });
+    }
+
+  }
+
+  //bot command to invite people to play some jackbox 8)
+  if (cmd === `${prefix}${MESSAGE_CODES.JACKINVITE}`) {
+    message.channel.send(
+      "<@&657006035705397295> \n" +
+      "Time to play some Jackbox!");
+  }
+
+  //bot command to toggle jackbox time role
+  if (cmd === `${prefix}${MESSAGE_CODES.JACKTIME}`) {
+    let user = message.member
+    let isJack = user.roles.find(r => r.name === "Jackbox Time"); //check if user has jackbox time role
+
+    if (!isJack) {
+      user.addRole('657006035705397295')
+        .then(() => {
+          console.log("Jackbox Time role successfully added to " + user.nickname)
+          message.author.send("You're all set! You will now be mentioned whenever someones uses the !jackinvite command. You can disable this anytime by using the !jacktime command again!")
+        });
+    } else {
+      user.removeRole('657006035705397295')
+        .then(() => {
+          console.log("Jackbox Time role successfully removed from " + user.nickname)
+          message.author.send("Alright, I have removed the Jackbox Time role from you. You won't be mentioned again.")
         });
     }
 

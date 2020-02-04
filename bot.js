@@ -447,6 +447,7 @@ Here's the list of commands for the server!
   }
 
   //bot command that lets a user apply to be a part of the staff team
+  /*
   if (cmd === `${prefix}${MESSAGE_CODES.APPLY}`) {
     //!apply hey this is why im applying hahalmao
     let aUser = message.author.username; //gets applicant's username
@@ -539,7 +540,7 @@ Here's the list of commands for the server!
       return;
     }
   }
-};
+};*/
 
 // Create a function-wrapper for the interval function to avoid duplicity.
 // We also want to call it once on startup.

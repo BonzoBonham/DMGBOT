@@ -10,7 +10,6 @@ const Gamedig = require("gamedig");
 const fs = require("fs");
 const bot = new Discord.Client({ disableEveryone: true });
 
-
 let appstatus = true;
 const TEXT_CHANNEL = channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
@@ -27,7 +26,7 @@ const MESSAGE_CODES = {
   INVITE: "tttinvite",
   POTINVITE: "potinvite",
   BOT_INFO: "botinfo",
-  APPLY: "apply",
+  //APPLY: "apply",
   CHANGE_APPLICATION: "apps",
   HELP: "help",
   MUTE: "mute",
@@ -62,7 +61,7 @@ const POT_STARTUP_MESSAGE =
   `---------------------------`;
 
 // Handle potential uncaught errors resulting from dependencies.
-process.on("unhandledRejection", function (err, promise) {
+process.on("unhandledRejection", function(err, promise) {
   // ignore improperly-chained promise rejections from Sequential.js
   if (err.stack.includes("Sequential.js:79:15")) {
     return;
@@ -97,7 +96,7 @@ const handlePotGamedigQuery = () => {
         console.log("Potpourri Server is offline");
       });
   });
-}
+};
 
 //Function called every 30000 ms to update the "game" played by the bot
 const activityupdate = () =>
@@ -246,8 +245,7 @@ const handleMessage = message => {
 
   //bot command that mutes people lmao
   if (cmd === `${prefix}${MESSAGE_CODES.MUTE}`) {
-
-    message.channel.send("muting...")
+    message.channel.send("muting...");
     if (args.length != 1) {
       message.channel.send("Invalid Arguments!");
       return;
@@ -256,7 +254,9 @@ const handleMessage = message => {
 
     //USER MUST BE COMMUNITY MANAGER OR DISCORD MOD TO MUTE
     let isCM = message.member.roles.find(r => r.name === "Community Manager"); //user using !apps must be community manager
-    let isDiscordMod = message.member.roles.find(r => r.name === "Discord Moderator"); //applying user must be detective 
+    let isDiscordMod = message.member.roles.find(
+      r => r.name === "Discord Moderator"
+    ); //applying user must be detective
     if (!isCM && !isDiscordMod) {
       message.channel.send("Permission denied!");
       return;
@@ -264,15 +264,15 @@ const handleMessage = message => {
 
     let Guild = message.guild;
 
-    Guild.channels.filter(e => e.type !== 'voice').forEach(channel => {
-      channel.overwritePermissions(user, {
-        SEND_MESSAGES: false
-      })
-    })
-    message.channel.send(user + " Muted!")
-
+    Guild.channels
+      .filter(e => e.type !== "voice")
+      .forEach(channel => {
+        channel.overwritePermissions(user, {
+          SEND_MESSAGES: false
+        });
+      });
+    message.channel.send(user + " Muted!");
   }
-
 
   //bot command that returns amount of online players and map being played
   if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`) {
@@ -280,14 +280,14 @@ const handleMessage = message => {
       .then(state => {
         message.channel.send(
           "<@&644704497150590997> \n" +
-          "The server has " +
-          state.players.length +
-          " players on right now.\n" +
-          "The server is on the map " +
-          state.map +
-          " right now.\n" +
-          "Come join us! " +
-          STEAM_SERVER_LINK
+            "The server has " +
+            state.players.length +
+            " players on right now.\n" +
+            "The server is on the map " +
+            state.map +
+            " right now.\n" +
+            "Come join us! " +
+            STEAM_SERVER_LINK
         );
         return Promise.resolve();
       })
@@ -310,7 +310,6 @@ Here's the list of commands for the server!
 ***!help:*** DM's you this help message again.
 ***!apps:*** Enable or disable the !apply command (Community Managers only!) 
 ***!botinfo:*** Display the credits.`);
-
   }
 
   //Command for Potpourri invite
@@ -319,13 +318,13 @@ Here's the list of commands for the server!
       .then(state => {
         message.channel.send(
           "The server has " +
-          state.players.length +
-          " players on right now.\n" +
-          "The server is on the map " +
-          state.map +
-          " right now.\n" +
-          "Come join us! " +
-          POT_STEAM_SERVER_LINK
+            state.players.length +
+            " players on right now.\n" +
+            "The server is on the map " +
+            state.map +
+            " right now.\n" +
+            "Come join us! " +
+            POT_STEAM_SERVER_LINK
         );
         return Promise.resolve();
       })
@@ -334,76 +333,85 @@ Here's the list of commands for the server!
 
   //bot command to toggle ttt time role
   if (cmd === `${prefix}${MESSAGE_CODES.TTTTIME}`) {
-    let user = message.member
+    let user = message.member;
     let isTTT = user.roles.find(r => r.name === "TTT Time"); //check if user has ttt time role
 
     if (!isTTT) {
-      user.addRole('644704497150590997')
-        .then(() => {
-          console.log("TTT Time role successfully added to " + user.nickname)
-          message.author.send("You're all set! You will now be mentioned whenever someones uses the !tttinvite command. You can disable this anytime by using the !ttttime command again!")
-        });
+      user.addRole("644704497150590997").then(() => {
+        console.log("TTT Time role successfully added to " + user.nickname);
+        message.author.send(
+          "You're all set! You will now be mentioned whenever someones uses the !tttinvite command. You can disable this anytime by using the !ttttime command again!"
+        );
+      });
     } else {
-      user.removeRole('644704497150590997')
-        .then(() => {
-          console.log("TTT Time role successfully added to " + user.nickname)
-          message.author.send("Alright, I have removed the TTT Time role from you. You won't be mentioned again.")
-        });
+      user.removeRole("644704497150590997").then(() => {
+        console.log("TTT Time role successfully added to " + user.nickname);
+        message.author.send(
+          "Alright, I have removed the TTT Time role from you. You won't be mentioned again."
+        );
+      });
     }
-
   }
 
   //bot command to invite people to play some jackbox 8)
   if (cmd === `${prefix}${MESSAGE_CODES.JACKINVITE}`) {
     message.channel.send(
-      "<@&657006035705397295> \n" +
-      "Time to play some Jackbox!");
+      "<@&657006035705397295> \n" + "Time to play some Jackbox!"
+    );
   }
 
-  //bot command to invite people to play some halo 8)
+  // bot command to invite people to play some halo 8)
   if (cmd === `${prefix}${MESSAGE_CODES.HALOINVITE}`) {
     message.channel.send(
-      "<@&660591794882478112> \n" +
-      "Time to play some Halo!");
+      "<@&660591794882478112> \n" + "Time to play some Halo!"
+    );
   }
 
   //bot command to toggle jackbox time role
   if (cmd === `${prefix}${MESSAGE_CODES.JACKTIME}`) {
-    let user = message.member
+    let user = message.member;
     let isJack = user.roles.find(r => r.name === "Jackbox Time"); //check if user has jackbox time role
 
     if (!isJack) {
-      user.addRole('657006035705397295')
-        .then(() => {
-          console.log("Jackbox Time role successfully added to " + user.nickname)
-          message.author.send("You're all set! You will now be mentioned whenever someones uses the !jackinvite command. You can disable this anytime by using the !jacktime command again!")
-        });
+      user.addRole("657006035705397295").then(() => {
+        console.log("Jackbox Time role successfully added to " + user.nickname);
+        message.author.send(
+          "You're all set! You will now be mentioned whenever someones uses the !jackinvite command. You can disable this anytime by using the !jacktime command again!"
+        );
+      });
     } else {
-      user.removeRole('657006035705397295')
-        .then(() => {
-          console.log("Jackbox Time role successfully removed from " + user.nickname)
-          message.author.send("Alright, I have removed the Jackbox Time role from you. You won't be mentioned again.")
-        });
+      user.removeRole("657006035705397295").then(() => {
+        console.log(
+          "Jackbox Time role successfully removed from " + user.nickname
+        );
+        message.author.send(
+          "Alright, I have removed the Jackbox Time role from you. You won't be mentioned again."
+        );
+      });
     }
   }
 
   //bot command to toggle halo time role
   if (cmd === `${prefix}${MESSAGE_CODES.HALOTIME}`) {
-    let user = message.member
+    let user = message.member;
     let isHalo = user.roles.find(r => r.name === "Halo Time"); //check if user has jackbox time role
 
     if (!isHalo) {
-      user.addRole('660591794882478112')
-        .then(() => {
-          console.log("Halo Time role successfully added to " + user.nickname)
-          message.author.send("You're all set! You will now be mentioned whenever someones uses the !haloinvite command. You can disable this anytime by using the !halotime command again!")
-        });
+      user.addRole("660591794882478112").then(() => {
+        console.log("Halo Time role successfully added to " + user.nickname);
+        message.author.send(
+          "You're all set! You will now be mentioned whenever someones uses the !haloinvite command. You can disable this anytime by using the !halotime command again!"
+        );
+      });
     } else {
-      user.removeRole('660591794882478112')
-        .then(() => {
-          console.log("Halo Time role successfully removed from " + user.nickname)
-          message.author.send("Alright, I have removed the Halo Time role from you. You won't be mentioned again.")
-        });
+      user.removeRole("660591794882478112").then(() => {
+        console.log(
+          "Halo Time role successfully removed from " + user.nickname
+        );
+        message.author.send(
+          "Alright, I have removed the Halo Time role from you. You won't be mentioned again."
+        );
+      });
     }
   }
 

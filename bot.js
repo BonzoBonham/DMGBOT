@@ -272,6 +272,7 @@ const handleMessage = message => {
     message.channel.send(user + " Muted!")
 
   }
+  
 
 
   //bot command that returns amount of online players and map being played

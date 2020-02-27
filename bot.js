@@ -23,19 +23,21 @@ const DEFAULT_UPDATE_INTERVAL = 30000; // Thirty seconds
 const MESSAGE_CODES = {
   PLAYERS: "tttplayers",
   POTPLAYERS: "potplayers",
-  INVITE: "tttinvite",
-  POTINVITE: "potinvite",
+  INVITE: "ttt",
+  POTINVITE: "pot",
   BOT_INFO: "botinfo",
   //APPLY: "apply",
   CHANGE_APPLICATION: "apps",
   HELP: "help",
   MUTE: "mute",
   UNMUTE: "unmute",
-  TTTTIME: "ttttime",
-  JACKTIME: "jacktime",
-  JACKINVITE: "jackinvite",
-  HALOTIME: "halotime",
-  HALOINVITE: "haloinvite"
+  TTTTIME: "role ttt",
+  JACKTIME: "role jackbox",
+  JACKINVITE: "jackbox",
+  HALOTIME: "role halo",
+  HALOINVITE: "halo",
+  SCRIBBLIOINVITE: "scrib",
+  SCRIBBLIOTIME: "role scrib"
 };
 
 const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
@@ -367,6 +369,13 @@ Here's the list of commands for the server!
     );
   }
 
+  // bot command to invite people to play some scribblio 8)
+  if (cmd === `${prefix}${MESSAGE_CODES.SCRIBBLIOINVITE}`) {
+    message.channel.send(
+      "<@&682652516336533568> \n" + "Time to play some Scribbl.io!"
+    );
+  }
+
   //bot command to toggle jackbox time role
   if (cmd === `${prefix}${MESSAGE_CODES.JACKTIME}`) {
     let user = message.member;
@@ -381,6 +390,30 @@ Here's the list of commands for the server!
       });
     } else {
       user.removeRole("657006035705397295").then(() => {
+        console.log(
+          "Jackbox Time role successfully removed from " + user.nickname
+        );
+        message.author.send(
+          "Alright, I have removed the Jackbox Time role from you. You won't be mentioned again."
+        );
+      });
+    }
+  }
+
+  //bot command to toggle scribblio time role
+  if (cmd === `${prefix}${MESSAGE_CODES.SCRIBBLIOTIME}`) {
+    let user = message.member;
+    let isJack = user.roles.find(r => r.name === "Scribbl.io Time"); //check if user has jackbox time role
+
+    if (!isJack) {
+      user.addRole("682652516336533568").then(() => {
+        console.log("Jackbox Time role successfully added to " + user.nickname);
+        message.author.send(
+          "You're all set! You will now be mentioned whenever someones uses the !jackinvite command. You can disable this anytime by using the !jacktime command again!"
+        );
+      });
+    } else {
+      user.removeRole("682652516336533568").then(() => {
         console.log(
           "Jackbox Time role successfully removed from " + user.nickname
         );

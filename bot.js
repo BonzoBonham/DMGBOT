@@ -470,7 +470,7 @@ Here's the list of commands for the server!
             );
           });
         }
-
+        break;
       case "jackbox":
         let isJack = user.roles.find(r => r.name === "Jackbox Time"); //check if user has jackbox time role
 
@@ -493,7 +493,7 @@ Here's the list of commands for the server!
             );
           });
         }
-
+        break;
       case "scribbl.io":
         let isScrib = user.roles.find(r => r.name === "Scribbl.io Time"); //check if user has jackbox time role
 
@@ -516,7 +516,7 @@ Here's the list of commands for the server!
             );
           });
         }
-
+        break;
       case "halo":
         let isHalo = user.roles.find(r => r.name === "Halo Time"); //check if user has halo time role
 
@@ -539,7 +539,7 @@ Here's the list of commands for the server!
             );
           });
         }
-
+        break;
       default:
         message.channel.send("I don't recognize that game.");
     }

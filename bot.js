@@ -37,7 +37,8 @@ const MESSAGE_CODES = {
   HALOTIME: "role halo",
   HALOINVITE: "halo",
   SCRIBBLIOINVITE: "scrib",
-  SCRIBBLIOTIME: "role scrib"
+  SCRIBBLIOTIME: "role scrib",
+  ROLE: "role"
 };
 
 const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
@@ -445,6 +446,102 @@ Here's the list of commands for the server!
           "Alright, I have removed the Halo Time role from you. You won't be mentioned again."
         );
       });
+    }
+  }
+
+  if (cmd === `${prefix}${MESSAGE_CODES.ROLE}`) {
+    let user = message.member;
+    switch (args[0]) {
+      case "ttt":
+        let isTTT = user.roles.find(r => r.name === "TTT Time"); //check if user has ttt time role
+
+        if (!isTTT) {
+          user.addRole("644704497150590997").then(() => {
+            console.log("TTT Time role successfully added to " + user.nickname);
+            message.author.send(
+              "You're all set! You will now be mentioned whenever someones uses the !tttinvite command. You can disable this anytime by using the !ttttime command again!"
+            );
+          });
+        } else {
+          user.removeRole("644704497150590997").then(() => {
+            console.log("TTT Time role successfully added to " + user.nickname);
+            message.author.send(
+              "Alright, I have removed the TTT Time role from you. You won't be mentioned again."
+            );
+          });
+        }
+
+      case "jackbox":
+        let isJack = user.roles.find(r => r.name === "Jackbox Time"); //check if user has jackbox time role
+
+        if (!isJack) {
+          user.addRole("657006035705397295").then(() => {
+            console.log(
+              "Jackbox Time role successfully added to " + user.nickname
+            );
+            message.author.send(
+              "You're all set! You will now be mentioned whenever someones uses the !jackinvite command. You can disable this anytime by using the !jacktime command again!"
+            );
+          });
+        } else {
+          user.removeRole("657006035705397295").then(() => {
+            console.log(
+              "Jackbox Time role successfully removed from " + user.nickname
+            );
+            message.author.send(
+              "Alright, I have removed the Jackbox Time role from you. You won't be mentioned again."
+            );
+          });
+        }
+
+      case "scribbl.io":
+        let isScrib = user.roles.find(r => r.name === "Scribbl.io Time"); //check if user has jackbox time role
+
+        if (!isScrib) {
+          user.addRole("682652516336533568").then(() => {
+            console.log(
+              "Jackbox Time role successfully added to " + user.nickname
+            );
+            message.author.send(
+              "You're all set! You will now be mentioned whenever someones uses the !jackinvite command. You can disable this anytime by using the !jacktime command again!"
+            );
+          });
+        } else {
+          user.removeRole("682652516336533568").then(() => {
+            console.log(
+              "Jackbox Time role successfully removed from " + user.nickname
+            );
+            message.author.send(
+              "Alright, I have removed the Jackbox Time role from you. You won't be mentioned again."
+            );
+          });
+        }
+
+      case "halo":
+        let isHalo = user.roles.find(r => r.name === "Halo Time"); //check if user has halo time role
+
+        if (!isHalo) {
+          user.addRole("660591794882478112").then(() => {
+            console.log(
+              "Halo Time role successfully added to " + user.nickname
+            );
+            message.author.send(
+              "You're all set! You will now be mentioned whenever someones uses the !haloinvite command. You can disable this anytime by using the !halotime command again!"
+            );
+          });
+        } else {
+          user.removeRole("660591794882478112").then(() => {
+            console.log(
+              "Halo Time role successfully removed from " + user.nickname
+            );
+            message.author.send(
+              "Alright, I have removed the Halo Time role from you. You won't be mentioned again."
+            );
+          });
+        }
+
+      default:
+        message.channel.send("I don't recognize that game.");
     }
   }
 

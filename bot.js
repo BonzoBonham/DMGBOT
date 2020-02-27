@@ -36,7 +36,7 @@ const MESSAGE_CODES = {
   JACKINVITE: "jackbox",
   HALOTIME: "role halo",
   HALOINVITE: "halo",
-  SCRIBBLIOINVITE: "scrib",
+  SCRIBBLIOINVITE: "scribbl.io",
   SCRIBBLIOTIME: "role scrib",
   ROLE: "role"
 };
@@ -459,7 +459,7 @@ Here's the list of commands for the server!
           user.addRole("644704497150590997").then(() => {
             console.log("TTT Time role successfully added to " + user.nickname);
             message.author.send(
-              "You're all set! You will now be mentioned whenever someones uses the !tttinvite command. You can disable this anytime by using the !ttttime command again!"
+              "You're all set! You will now be mentioned whenever someones uses the !ttt command. You can disable this anytime by using the !role ttt command again!"
             );
           });
         } else {
@@ -480,7 +480,7 @@ Here's the list of commands for the server!
               "Jackbox Time role successfully added to " + user.nickname
             );
             message.author.send(
-              "You're all set! You will now be mentioned whenever someones uses the !jackinvite command. You can disable this anytime by using the !jacktime command again!"
+              "You're all set! You will now be mentioned whenever someones uses the !jackbox command. You can disable this anytime by using the !role jackbox command again!"
             );
           });
         } else {
@@ -503,7 +503,7 @@ Here's the list of commands for the server!
               "Jackbox Time role successfully added to " + user.nickname
             );
             message.author.send(
-              "You're all set! You will now be mentioned whenever someones uses the !jackinvite command. You can disable this anytime by using the !jacktime command again!"
+              "You're all set! You will now be mentioned whenever someones uses the !scrib command. You can disable this anytime by using the !role scribbl.io command again!"
             );
           });
         } else {
@@ -512,7 +512,7 @@ Here's the list of commands for the server!
               "Jackbox Time role successfully removed from " + user.nickname
             );
             message.author.send(
-              "Alright, I have removed the Jackbox Time role from you. You won't be mentioned again."
+              "Alright, I have removed the Scribbl.io Time role from you. You won't be mentioned again."
             );
           });
         }
@@ -526,7 +526,7 @@ Here's the list of commands for the server!
               "Halo Time role successfully added to " + user.nickname
             );
             message.author.send(
-              "You're all set! You will now be mentioned whenever someones uses the !haloinvite command. You can disable this anytime by using the !halotime command again!"
+              "You're all set! You will now be mentioned whenever someones uses the !halo command. You can disable this anytime by using the !role halo command again!"
             );
           });
         } else {
@@ -541,7 +541,9 @@ Here's the list of commands for the server!
         }
         break;
       default:
-        message.channel.send("I don't recognize that game.");
+        message.channel.send(
+          "I don't recognize that game, please check what you wrote and try again!"
+        );
     }
   }
 

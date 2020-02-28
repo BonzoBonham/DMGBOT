@@ -497,6 +497,7 @@ Here's the list of commands for the server!
       case "skribbl.io":
         let isScrib = user.roles.find(r => r.name === "Skribbl.io Time"); //check if user has jackbox time role
 
+        
         if (!isScrib) {
           user.addRole("682652516336533568").then(() => {
             console.log(

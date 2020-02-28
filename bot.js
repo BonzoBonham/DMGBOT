@@ -36,7 +36,7 @@ const MESSAGE_CODES = {
   JACKINVITE: "jackbox",
   HALOTIME: "role halo",
   HALOINVITE: "halo",
-  SCRIBBLIOINVITE: "scribbl.io",
+  SCRIBBLIOINVITE: "skribbl.io",
   SCRIBBLIOTIME: "role scrib",
   ROLE: "role"
 };
@@ -373,7 +373,7 @@ Here's the list of commands for the server!
   // bot command to invite people to play some scribblio 8)
   if (cmd === `${prefix}${MESSAGE_CODES.SCRIBBLIOINVITE}`) {
     message.channel.send(
-      "<@&682652516336533568> \n" + "Time to play some Scribbl.io!"
+      "<@&682652516336533568> \n" + "Time to play some Skribbl.io!"
     );
   }
 
@@ -495,7 +495,7 @@ Here's the list of commands for the server!
         }
         break;
       case "scribbl.io":
-        let isScrib = user.roles.find(r => r.name === "Scribbl.io Time"); //check if user has jackbox time role
+        let isScrib = user.roles.find(r => r.name === "Skribbl.io Time"); //check if user has jackbox time role
 
         if (!isScrib) {
           user.addRole("682652516336533568").then(() => {
@@ -503,7 +503,7 @@ Here's the list of commands for the server!
               "Jackbox Time role successfully added to " + user.nickname
             );
             message.author.send(
-              "You're all set! You will now be mentioned whenever someones uses the !scrib command. You can disable this anytime by using the !role scribbl.io command again!"
+              "You're all set! You will now be mentioned whenever someones uses the !skribbl.io command. You can disable this anytime by using the !role scribbl.io command again!"
             );
           });
         } else {

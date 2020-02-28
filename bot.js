@@ -494,7 +494,7 @@ Here's the list of commands for the server!
           });
         }
         break;
-      case "scribbl.io":
+      case "skribbl.io":
         let isScrib = user.roles.find(r => r.name === "Skribbl.io Time"); //check if user has jackbox time role
 
         if (!isScrib) {

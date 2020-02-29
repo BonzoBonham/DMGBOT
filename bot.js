@@ -239,6 +239,27 @@ const handleMessage = message => {
     );
   }
 
+  //bot command to invite people to play some jackbox 8)
+  if (cmd === `${prefix}${MESSAGE_CODES.JACKINVITE}`) {
+    message.channel.send(
+      "<@&657006035705397295> \n" + "Time to play some Jackbox!"
+    );
+  }
+
+  // bot command to invite people to play some halo 8)
+  if (cmd === `${prefix}${MESSAGE_CODES.HALOINVITE}`) {
+    message.channel.send(
+      "<@&660591794882478112> \n" + "Time to play some Halo!"
+    );
+  }
+
+  // bot command to invite people to play some scribblio 8)
+  if (cmd === `${prefix}${MESSAGE_CODES.SCRIBBLIOINVITE}`) {
+    message.channel.send(
+      "<@&682652516336533568> \n" + "Time to play some Skribbl.io!"
+    );
+  }
+  
   //bot command that returns amount of online players and map being played
   if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`) {
     handleGamedigQuery()

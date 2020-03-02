@@ -30,7 +30,7 @@ const MESSAGE_CODES = {
   HELP: "help",
   JACKINVITE: "jackbox",
   HALOINVITE: "halo",
-  SCRIBBLIOINVITE: "scribbl.io",
+  SCRIBBLIOINVITE: "skribbl.io",
   ROLE: "role"
 };
 
@@ -259,7 +259,7 @@ const handleMessage = message => {
       "<@&682652516336533568> \n" + "Time to play some Skribbl.io!"
     );
   }
-  
+
   //bot command that returns amount of online players and map being played
   if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`) {
     handleGamedigQuery()

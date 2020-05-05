@@ -9,7 +9,6 @@ const Discord = require("discord.js");
 const Gamedig = require("gamedig");
 const bot = new Discord.Client({ disableEveryone: true });
 
-
 let appstatus = true;
 let fix;
 const TEXT_CHANNEL = channels.TEXT;
@@ -266,7 +265,7 @@ const handleMessage = (message) => {
   // bot command to invite people to play some scribblio 8)
   if (cmd === `${prefix}${MESSAGE_CODES.L4D2INVITE}`) {
     message.channel.send(
-      "<@&682652516336533568> \n" + "Time to play some Skribbl.io!"
+      "<@&693672686114701320> \n" + "Time to play some Left 4 Dead 2!"
     );
   }
 

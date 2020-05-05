@@ -9,7 +9,9 @@ const Discord = require("discord.js");
 const Gamedig = require("gamedig");
 const bot = new Discord.Client({ disableEveryone: true });
 
+
 let appstatus = true;
+let fix;
 const TEXT_CHANNEL = channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
 const APPLICATION_CHANNEL = channels.APPLICATION;

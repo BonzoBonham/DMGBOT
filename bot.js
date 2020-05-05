@@ -3,7 +3,7 @@ const {
   token,
   gamedigConfig,
   gamedigPotConfig,
-  channels
+  channels,
 } = require("./botconfig.json");
 const Discord = require("discord.js");
 const Gamedig = require("gamedig");
@@ -31,7 +31,8 @@ const MESSAGE_CODES = {
   JACKINVITE: "jackbox",
   HALOINVITE: "halo",
   SCRIBBLIOINVITE: "skribbl.io",
-  ROLE: "role"
+  L4D2INVITE: "l4d2",
+  ROLE: "role",
 };
 
 const POT_STEAM_SERVER_LINK = "steam://connect/192.223.27.68:27015";
@@ -57,7 +58,7 @@ const POT_STARTUP_MESSAGE =
   `---------------------------`;
 
 // Handle potential uncaught errors resulting from dependencies.
-process.on("unhandledRejection", function(err, promise) {
+process.on("unhandledRejection", function (err, promise) {
   // ignore improperly-chained promise rejections from Sequential.js
   if (err.stack.includes("Sequential.js:79:15")) {
     return;
@@ -75,20 +76,20 @@ bot.on("error", console.error);
 
 // handles all queries to gamedig
 const handleGamedigQuery = () =>
-  new Promise(resolve => {
+  new Promise((resolve) => {
     return Gamedig.query(gamedigConfig)
       .then(resolve)
-      .catch(error => {
+      .catch((error) => {
         console.log("TTT Server is offline");
       });
   });
 
 // handle potpourri querry to gamedig
 const handlePotGamedigQuery = () => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     Gamedig.query(gamedigPotConfig)
       .then(resolve)
-      .catch(error => {
+      .catch((error) => {
         console.log("Potpourri Server is offline");
       });
   });
@@ -96,7 +97,7 @@ const handlePotGamedigQuery = () => {
 
 //Function called every 30000 ms to update the "game" played by the bot
 const activityupdate = () =>
-  handleGamedigQuery().then(state => {
+  handleGamedigQuery().then((state) => {
     var status = state.players.length + " in " + state.map;
     bot.user.setActivity("!help", { type: "PLAYING" });
     console.log("Bot activity status updated!");
@@ -105,10 +106,10 @@ const activityupdate = () =>
 // Will return a list of all active players by-name joined by the specified delimiter
 const getActivePlayers = (delimiter = ", \n") =>
   handleGamedigQuery()
-    .then(state => {
+    .then((state) => {
       return Promise.resolve(
         state.players.length
-          ? state.players.map(ply => ply.name).join(delimiter)
+          ? state.players.map((ply) => ply.name).join(delimiter)
           : ""
       );
     })
@@ -117,10 +118,10 @@ const getActivePlayers = (delimiter = ", \n") =>
 // Will return potpourri's players by name.
 const getPotActivePlayers = (delimiter = ", \n") =>
   handlePotGamedigQuery()
-    .then(state => {
+    .then((state) => {
       return Promise.resolve(
         state.players.length
-          ? state.players.map(ply => ply.name).join(delimiter)
+          ? state.players.map((ply) => ply.name).join(delimiter)
           : ""
       );
     })
@@ -130,7 +131,7 @@ const getPotActivePlayers = (delimiter = ", \n") =>
 const voicechannelupdate = () =>
   //Server status query
   handleGamedigQuery()
-    .then(state => {
+    .then((state) => {
       var status = state.players.length + " in " + state.map;
       let statuschannel = bot.channels.get(VOICE_CHANNEL);
       statuschannel.setName(status);
@@ -143,7 +144,7 @@ const voicechannelupdate = () =>
 const potvoicechannelupdate = () =>
   //Server status query
   handlePotGamedigQuery()
-    .then(state => {
+    .then((state) => {
       var status = state.players.length + " in " + state.map;
       let statuschannel = bot.channels.get(POT_VOICE_CHANNEL);
       statuschannel.setName(status);
@@ -155,8 +156,8 @@ const potvoicechannelupdate = () =>
 //Function called every 30000ms to update the playerlist in the player list channel
 const textchannelupdate = (message, channel) =>
   getActivePlayers()
-    .then(players => {
-      return channel.fetchMessages().then(messages => {
+    .then((players) => {
+      return channel.fetchMessages().then((messages) => {
         players = players.length
           ? players
           : "----***There are no players online right now, be the first to join!***----";
@@ -164,7 +165,7 @@ const textchannelupdate = (message, channel) =>
         // Ensure we obtain the first message sent with the startup-message
         let sortedMessages = [...messages]
           .sort((fm, sm) => fm[0] - sm[0])
-          .map(msg => msg[1])
+          .map((msg) => msg[1])
           .filter(
             ({ author, content }) =>
               content.includes(STARTUP_MESSAGE_PLAYERS_KEY) && author.bot
@@ -183,8 +184,8 @@ const textchannelupdate = (message, channel) =>
 //Function called every 30000ms to update the POTPOURRI playerlist in the POT player list channel
 const pottextchannelupdate = (message, channel) =>
   getPotActivePlayers()
-    .then(players => {
-      return channel.fetchMessages().then(messages => {
+    .then((players) => {
+      return channel.fetchMessages().then((messages) => {
         players = players.length
           ? players
           : "----***There are no players online right now, be the first to join!***----";
@@ -192,7 +193,7 @@ const pottextchannelupdate = (message, channel) =>
         // Ensure we obtain the first message sent with the startup-message
         let sortedMessages = [...messages]
           .sort((fm, sm) => fm[0] - sm[0])
-          .map(msg => msg[1])
+          .map((msg) => msg[1])
           .filter(
             ({ author, content }) =>
               content.includes(STARTUP_MESSAGE_PLAYERS_KEY) && author.bot
@@ -209,7 +210,7 @@ const pottextchannelupdate = (message, channel) =>
     .catch(console.error);
 
 //List of commands that can be called to the bot
-const handleMessage = message => {
+const handleMessage = (message) => {
   if (
     message === undefined || // Message must exist
     message.author.bot || // Message must not be from the bot
@@ -225,8 +226,8 @@ const handleMessage = message => {
   // Allow l/u-case commands. Return an error if the command is invalid
   if (
     !Object.values(MESSAGE_CODES)
-      .map(code => prefix + code.toLowerCase())
-      .find(code => code === cmd.toLowerCase())
+      .map((code) => prefix + code.toLowerCase())
+      .find((code) => code === cmd.toLowerCase())
   ) {
     console.log("Sorry! We didn't recognize that command.");
     //message.channel.send("Sorry! We didn't recognize that command.");
@@ -260,10 +261,17 @@ const handleMessage = message => {
     );
   }
 
+  // bot command to invite people to play some scribblio 8)
+  if (cmd === `${prefix}${MESSAGE_CODES.L4D2INVITE}`) {
+    message.channel.send(
+      "<@&682652516336533568> \n" + "Time to play some Skribbl.io!"
+    );
+  }
+
   //bot command that returns amount of online players and map being played
   if (cmd === `${prefix}${MESSAGE_CODES.INVITE}`) {
     handleGamedigQuery()
-      .then(state => {
+      .then((state) => {
         message.channel.send(
           "<@&644704497150590997> \n" +
             "The server has " +
@@ -288,22 +296,31 @@ The current map and player count is displayed in the respective voice channel, w
     
 Here's the list of commands for the server!    
 
-***!tttinvite:*** Announces current player count and map in the TTT server, along with a direct invite link.
-***!potinvite:*** Announces current player count and map in the Potpourri server, along with a direct invite link.
+***!ttt:*** Announces current player count and map in the TTT server, along with a direct invite link.
+***!pot:*** Announces current player count and map in the Potpourri server, along with a direct invite link.
 ***!apply <reason>:*** Use this command to apply for a staff position. Replace <reason> with your own reason for joining the staff team. Follow my commands to send your application. (Detectives only!)
 ***!tttplayers:*** DM's you the list of the current TTT players.
 ***!potplayers:*** DM's you the list of the current Potpourri players.
 ***!help:*** DM's you this help message again.
 ***!apps:*** Enable or disable the !apply command (Community Managers only!) 
-***!botinfo:*** Display the credits.`);
+***!botinfo:*** Display the credits.
+***!role <game>:*** Gives you the invite role for that specific game. The list is up ahead.
+***!ttt:*** Announces current player count and map in the TTT server, along with a direct invite link.
+***!pot:*** Announces current player count and map in the Potpourri server, along with a direct invite link.
+***!jackbox:*** Invite people to play Jackbox
+***!halo:*** Invite people to play Jackbox
+***!skribbl.io:*** Invite people to play Jackbox
+***!l4d2.io:*** Invite people to play Jackbox
+`);
   }
 
   //Command for Potpourri invite
   if (cmd === `${prefix}${MESSAGE_CODES.POTINVITE}`) {
     handlePotGamedigQuery()
-      .then(state => {
+      .then((state) => {
         message.channel.send(
-          "The server has " +
+          "<@707340676186243104> \n" +
+            "The server has " +
             state.players.length +
             " players on right now.\n" +
             "The server is on the map " +
@@ -322,7 +339,7 @@ Here's the list of commands for the server!
     let user = message.member;
     switch (args[0]) {
       case "ttt":
-        let isTTT = user.roles.find(r => r.name === "TTT Time"); //check if user has ttt time role
+        let isTTT = user.roles.find((r) => r.name === "TTT Time"); //check if user has ttt time role
 
         if (!isTTT) {
           user.addRole("644704497150590997").then(() => {
@@ -341,7 +358,7 @@ Here's the list of commands for the server!
         }
         break;
       case "jackbox":
-        let isJack = user.roles.find(r => r.name === "Jackbox Time"); //check if user has jackbox time role
+        let isJack = user.roles.find((r) => r.name === "Jackbox Time"); //check if user has jackbox time role
 
         if (!isJack) {
           user.addRole("657006035705397295").then(() => {
@@ -364,7 +381,7 @@ Here's the list of commands for the server!
         }
         break;
       case "skribbl.io":
-        let isScrib = user.roles.find(r => r.name === "Skribbl.io Time"); //check if user has jackbox time role
+        let isScrib = user.roles.find((r) => r.name === "Skribbl.io Time"); //check if user has jackbox time role
 
         if (!isScrib) {
           user.addRole("682652516336533568").then(() => {
@@ -387,7 +404,7 @@ Here's the list of commands for the server!
         }
         break;
       case "halo":
-        let isHalo = user.roles.find(r => r.name === "Halo Time"); //check if user has halo time role
+        let isHalo = user.roles.find((r) => r.name === "Halo Time"); //check if user has halo time role
 
         if (!isHalo) {
           user.addRole("660591794882478112").then(() => {
@@ -409,6 +426,71 @@ Here's the list of commands for the server!
           });
         }
         break;
+      case "l4d2":
+        let isLeft = user.roles.find((r) => r.name === "L4D2 Time"); //check if user has l4d2 time role
+
+        if (!isLeft) {
+          user.addRole("693672686114701320").then(() => {
+            console.log(
+              "L4D2 Time role successfully added to " + user.nickname
+            );
+            message.author.send(
+              "You're all set! You will now be mentioned whenever someones uses the !l4d2 command. You can disable this anytime by using the !role l4d2 command again!"
+            );
+          });
+        } else {
+          user.removeRole("693672686114701320").then(() => {
+            console.log(
+              "L4D2 Time role successfully removed from " + user.nickname
+            );
+            message.author.send(
+              "Alright, I have removed the L4D2 Time role from you. You won't be mentioned again."
+            );
+          });
+        }
+        break;
+      case "pot":
+        let isPot = user.roles.find((r) => r.name === "Potpourri Time"); //check if user has pot time role
+
+        if (!isPot) {
+          user.addRole("707340676186243104").then(() => {
+            console.log("Pot Time role successfully added to " + user.nickname);
+            message.author.send(
+              "You're all set! You will now be mentioned whenever someones uses the !pot command. You can disable this anytime by using the !role pot command again!"
+            );
+          });
+        } else {
+          user.removeRole("707340676186243104").then(() => {
+            console.log(
+              "Pot Time role successfully removed from " + user.nickname
+            );
+            message.author.send(
+              "Alright, I have removed the Potpourri Time role from you. You won't be mentioned again."
+            );
+          });
+        }
+        break;
+      case "island":
+        let isIsland = user.roles.find((r) => r.name === "Island Dweller"); //check if user has island dweller role
+
+        if (!isIsland) {
+          user.addRole("692795722831233131").then(() => {
+            console.log(
+              "Island Dweller role successfully added to " + user.nickname
+            );
+            message.author.send("You're all set!");
+          });
+        } else {
+          user.removeRole("692795722831233131").then(() => {
+            console.log(
+              "Island Dweller role successfully removed from " + user.nickname
+            );
+            message.author.send(
+              "Alright, I have removed the Island Dweller role from you."
+            );
+          });
+        }
+        break;
       default:
         message.channel.send(
           "I don't recognize that game, please check what you wrote and try again!"
@@ -418,7 +500,7 @@ Here's the list of commands for the server!
 
   //bot command that changes the status for recieving applications
   if (cmd === `${prefix}${MESSAGE_CODES.CHANGE_APPLICATION}`) {
-    let isCM = message.member.roles.find(r => r.name === "Community Manager"); //user using !apps must be community manager
+    let isCM = message.member.roles.find((r) => r.name === "Community Manager"); //user using !apps must be community manager
     if (!isCM) {
       message.channel.send("Permission denied!");
       return;
@@ -437,7 +519,7 @@ Here's the list of commands for the server!
 
   //bot command that returns the names of every online player
   if (cmd === `${prefix}${MESSAGE_CODES.PLAYERS}`) {
-    getActivePlayers().then(players => {
+    getActivePlayers().then((players) => {
       message.author.send(
         "Player List: " + (players.length ? players : "No online players.")
       );
@@ -447,7 +529,7 @@ Here's the list of commands for the server!
 
   //bot command that returns the names of every online player
   if (cmd === `${prefix}${MESSAGE_CODES.POTPLAYERS}`) {
-    getPotActivePlayers().then(players => {
+    getPotActivePlayers().then((players) => {
       message.author.send(
         "Player List: " + (players.length ? players : "No online players.")
       );
@@ -460,7 +542,7 @@ Here's the list of commands for the server!
   if (cmd === `${prefix}${MESSAGE_CODES.APPLY}`) {
     //!apply hey this is why im applying hahalmao
     let aUser = message.author.username; //gets applicant's username
-    let isDetective = message.member.roles.find(r => r.name === "Detective"); //applying user must be detective
+    let isDetective = message.member.roles.find((r) => r.name === "Detective"); //applying user must be detective
     let aMessage = args.join(" ");
 
     if (!appstatus) {
@@ -481,11 +563,11 @@ Here's the list of commands for the server!
 
       const collector = new Discord.MessageCollector(
         message.channel,
-        m => m.author.id === message.author.id,
+        (m) => m.author.id === message.author.id,
         { time: 60000 }
       );
       console.log(collector);
-      collector.on("collect", message => {
+      collector.on("collect", (message) => {
         if (message.content.length <= 10) {
           message.reply(
             "Your application message should be longer than 10 characters! Try again."
@@ -505,7 +587,7 @@ Here's the list of commands for the server!
 
           message
             .awaitReactions(filter, { max: 1, time: 60000, errors: ["time"] })
-            .then(collected => {
+            .then((collected) => {
               const reaction = collected.first();
 
               if (reaction.emoji.name === "👍") {
@@ -522,7 +604,7 @@ Here's the list of commands for the server!
                 bot.channels
                   .get(APPLICATION_CHANNEL)
                   .send(applicationEmbed)
-                  .then(embedMessage => {
+                  .then((embedMessage) => {
                     embedMessage
                       .react("👍")
                       .then(() => embedMessage.react("👎"));
@@ -539,7 +621,7 @@ Here's the list of commands for the server!
                 );
               }
             })
-            .catch(collected => {
+            .catch((collected) => {
               message.reply(
                 "You didn't react with neither a thumbs up, nor a thumbs down. Try again!"
               );

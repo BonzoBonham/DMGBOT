@@ -309,9 +309,9 @@ Here's the list of commands for the server!
 ***!ttt:*** Announces current player count and map in the TTT server, along with a direct invite link.
 ***!pot:*** Announces current player count and map in the Potpourri server, along with a direct invite link.
 ***!jackbox:*** Invite people to play Jackbox
-***!halo:*** Invite people to play Jackbox
-***!skribbl.io:*** Invite people to play Jackbox
-***!l4d2.io:*** Invite people to play Jackbox
+***!halo:*** Invite people to play Halo
+***!skribbl.io:*** Invite people to play Skribbl.io
+***!l4d2:*** Invite people to play L4D2
 `);
   }
 

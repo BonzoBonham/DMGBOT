@@ -320,7 +320,7 @@ Here's the list of commands for the server!
     handlePotGamedigQuery()
       .then((state) => {
         message.channel.send(
-          "<@707340676186243104> \n" +
+          "<@&707340676186243104> \n" +
             "The server has " +
             state.players.length +
             " players on right now.\n" +

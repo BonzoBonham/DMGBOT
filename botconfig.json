@@ -1,19 +1,26 @@
 {
-	"prefix": "!",
-	"gamedigConfig": {
-	    "type": "garrysmod",
-	    "host": "66.151.244.2"
-	},
-	"gamedigPotConfig" : {
-		"type": "garrysmod",
-	   	"host": "192.223.27.68"
-	},
-	"channels": {
-		"TEXT": "573022289931796511",
-		"VOICE": "573022265416089603",
-		"APPLICATION": "578013891523510283",
-		"POTTEXT": "607896977270898689",
-		"POTVOICE": "607897137468145674"
-	},
-	"token": null
+  "prefix": "!",
+  "gamedigConfig": {
+    "type": "garrysmod",
+    "host": "66.151.244.2"
+  },
+  "gamedigPotConfig": {
+    "type": "garrysmod",
+    "host": "192.223.27.68"
+  },
+  "gamedigMineConfig": {
+    "type": "minecraft",
+    "host": "192.223.26.70",
+    "port": "25565"
+  },
+  "channels": {
+    "APPLICATION": "578013891523510283",
+    "TEXT": "573022289931796511",
+    "VOICE": "573022265416089603",
+    "POTTEXT": "607896977270898689",
+    "POTVOICE": "607897137468145674",
+    "MINETEXT": "725494773502181506",
+    "MINEVOICE": "725494814979915836"
+  },
+  "token": null
 }

@@ -3,6 +3,7 @@ const {
   token,
   gamedigConfig,
   gamedigPotConfig,
+  gamedigMineConfig,
   channels,
 } = require("./botconfig.json");
 const Discord = require("discord.js");
@@ -10,10 +11,11 @@ const Gamedig = require("gamedig");
 const bot = new Discord.Client({ disableEveryone: true });
 
 let appstatus = true;
-let fix;
+const APPLICATION_CHANNEL = channels.APPLICATION;
 const TEXT_CHANNEL = channels.TEXT;
 const VOICE_CHANNEL = channels.VOICE;
-const APPLICATION_CHANNEL = channels.APPLICATION;
+const MINE_TEXT_CHANNEL = channels.MINETEXT;
+const MINE_VOICE_CHANNEL = channels.MINEVOICE;
 const POT_TEXT_CHANNEL = channels.POTTEXT;
 const POT_VOICE_CHANNEL = channels.POTVOICE;
 
@@ -25,6 +27,7 @@ const MESSAGE_CODES = {
   POTPLAYERS: "potplayers",
   INVITE: "ttt",
   POTINVITE: "pot",
+  MINEINVITE: "minecraft",
   BOT_INFO: "botinfo",
   //APPLY: "apply",
   CHANGE_APPLICATION: "apps",
@@ -51,6 +54,16 @@ const STARTUP_MESSAGE =
 const POT_STARTUP_MESSAGE =
   `
 ***Click this link to open up Garry's Mod and connect to the server!***
+------------- ***` +
+  POT_STEAM_SERVER_LINK +
+  `*** ---------------
+--------------------------` +
+  STARTUP_MESSAGE_PLAYERS_KEY +
+  `---------------------------`;
+
+const MINE_STARTUP_MESSAGE =
+  `
+***Join our Minecraft server!***
 ------------- ***` +
   POT_STEAM_SERVER_LINK +
   `*** ---------------
@@ -96,10 +109,21 @@ const handlePotGamedigQuery = () => {
   });
 };
 
+// handle minecraft querry to gamedig
+const handleMineGamedigQuery = () => {
+  return new Promise((resolve) => {
+    Gamedig.query(gamedigMineConfig)
+      .then(resolve)
+      .catch((error) => {
+        console.log("Minecraft Server is offline");
+      });
+  });
+};
+
 //Function called every 30000 ms to update the "game" played by the bot
 const activityupdate = () =>
   handleGamedigQuery().then((state) => {
-    var status = state.players.length + " in " + state.map;
+    //var status = state.players.length + " in " + state.map;
     bot.user.setActivity("!help", { type: "PLAYING" });
     console.log("Bot activity status updated!");
   });
@@ -119,6 +143,17 @@ const getActivePlayers = (delimiter = ", \n") =>
 // Will return potpourri's players by name.
 const getPotActivePlayers = (delimiter = ", \n") =>
   handlePotGamedigQuery()
+    .then((state) => {
+      return Promise.resolve(
+        state.players.length
+          ? state.players.map((ply) => ply.name).join(delimiter)
+          : ""
+      );
+    })
+    .catch(console.error);
+
+const getMineActivePlayers = (delimiter = ", \n") =>
+  handleMineGamedigQuery()
     .then((state) => {
       return Promise.resolve(
         state.players.length
@@ -150,6 +185,19 @@ const potvoicechannelupdate = () =>
       let statuschannel = bot.channels.get(POT_VOICE_CHANNEL);
       statuschannel.setName(status);
       console.log("Potpourri status updated!");
+      Promise.resolve();
+    })
+    .catch(console.error);
+
+//Function called every 30000 ms to update the title of the voice channel with the POTPOURRI server status
+const minevoicechannelupdate = () =>
+  //Server status query
+  handleMineGamedigQuery()
+    .then((state) => {
+      var status = state.players.length + " playing Minecraft";
+      let statuschannel = bot.channels.get(MINE_VOICE_CHANNEL);
+      statuschannel.setName(status);
+      console.log("Minecraft status updated!");
       Promise.resolve();
     })
     .catch(console.error);
@@ -210,6 +258,33 @@ const pottextchannelupdate = (message, channel) =>
     })
     .catch(console.error);
 
+const minetextchannelupdate = (message, channel) =>
+  getMineActivePlayers()
+    .then((players) => {
+      return channel.fetchMessages().then((messages) => {
+        players = players.length
+          ? players
+          : "----***There are no players online right now, be the first to join!***----";
+
+        // Ensure we obtain the first message sent with the startup-message
+        let sortedMessages = [...messages]
+          .sort((fm, sm) => fm[0] - sm[0])
+          .map((msg) => msg[1])
+          .filter(
+            ({ author, content }) =>
+              content.includes(STARTUP_MESSAGE_PLAYERS_KEY) && author.bot
+          );
+
+        let lastMessage = sortedMessages[sortedMessages.length - 1];
+
+        // If the startup message is not in the list, send the message. Otherwise edit it.
+        return !lastMessage
+          ? channel.send(message + "\n" + players)
+          : lastMessage.edit(MINE_STARTUP_MESSAGE + "\n" + players);
+      });
+    })
+    .catch(console.error);
+
 //List of commands that can be called to the bot
 const handleMessage = (message) => {
   if (
@@ -262,10 +337,17 @@ const handleMessage = (message) => {
     );
   }
 
-  // bot command to invite people to play some scribblio 8)
+  // bot command to invite people to play some left4dead 8)
   if (cmd === `${prefix}${MESSAGE_CODES.L4D2INVITE}`) {
     message.channel.send(
       "<@&693672686114701320> \n" + "Time to play some Left 4 Dead 2!"
+    );
+  }
+
+  // bot command to invite people to play some halo 8)
+  if (cmd === `${prefix}${MESSAGE_CODES.MINEINVITE}`) {
+    message.channel.send(
+      "<@&725494456563925053> \n" + "Time to play some Minecraft!"
     );
   }
 
@@ -345,14 +427,14 @@ Here's the list of commands for the server!
         if (!isTTT) {
           user.addRole("644704497150590997").then(() => {
             console.log("TTT Time role successfully added to " + user.nickname);
-            message.author.send(
+            message.channel.send(
               "You're all set! You will now be mentioned whenever someones uses the !ttt command. You can disable this anytime by using the !role ttt command again!"
             );
           });
         } else {
           user.removeRole("644704497150590997").then(() => {
             console.log("TTT Time role successfully added to " + user.nickname);
-            message.author.send(
+            message.channel.send(
               "Alright, I have removed the TTT Time role from you. You won't be mentioned again."
             );
           });
@@ -366,7 +448,7 @@ Here's the list of commands for the server!
             console.log(
               "Jackbox Time role successfully added to " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "You're all set! You will now be mentioned whenever someones uses the !jackbox command. You can disable this anytime by using the !role jackbox command again!"
             );
           });
@@ -375,7 +457,7 @@ Here's the list of commands for the server!
             console.log(
               "Jackbox Time role successfully removed from " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "Alright, I have removed the Jackbox Time role from you. You won't be mentioned again."
             );
           });
@@ -389,7 +471,7 @@ Here's the list of commands for the server!
             console.log(
               "Jackbox Time role successfully added to " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "You're all set! You will now be mentioned whenever someones uses the !skribbl.io command. You can disable this anytime by using the !role scribbl.io command again!"
             );
           });
@@ -398,7 +480,7 @@ Here's the list of commands for the server!
             console.log(
               "Jackbox Time role successfully removed from " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "Alright, I have removed the Scribbl.io Time role from you. You won't be mentioned again."
             );
           });
@@ -412,7 +494,7 @@ Here's the list of commands for the server!
             console.log(
               "Halo Time role successfully added to " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "You're all set! You will now be mentioned whenever someones uses the !halo command. You can disable this anytime by using the !role halo command again!"
             );
           });
@@ -421,7 +503,7 @@ Here's the list of commands for the server!
             console.log(
               "Halo Time role successfully removed from " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "Alright, I have removed the Halo Time role from you. You won't be mentioned again."
             );
           });
@@ -435,7 +517,7 @@ Here's the list of commands for the server!
             console.log(
               "L4D2 Time role successfully added to " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "You're all set! You will now be mentioned whenever someones uses the !l4d2 command. You can disable this anytime by using the !role l4d2 command again!"
             );
           });
@@ -444,7 +526,7 @@ Here's the list of commands for the server!
             console.log(
               "L4D2 Time role successfully removed from " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "Alright, I have removed the L4D2 Time role from you. You won't be mentioned again."
             );
           });
@@ -456,7 +538,7 @@ Here's the list of commands for the server!
         if (!isPot) {
           user.addRole("707340676186243104").then(() => {
             console.log("Pot Time role successfully added to " + user.nickname);
-            message.author.send(
+            message.channel.send(
               "You're all set! You will now be mentioned whenever someones uses the !pot command. You can disable this anytime by using the !role pot command again!"
             );
           });
@@ -465,7 +547,7 @@ Here's the list of commands for the server!
             console.log(
               "Pot Time role successfully removed from " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "Alright, I have removed the Potpourri Time role from you. You won't be mentioned again."
             );
           });
@@ -479,15 +561,38 @@ Here's the list of commands for the server!
             console.log(
               "Island Dweller role successfully added to " + user.nickname
             );
-            message.author.send("You're all set!");
+            message.channel.send("You're all set!");
           });
         } else {
           user.removeRole("692795722831233131").then(() => {
             console.log(
               "Island Dweller role successfully removed from " + user.nickname
             );
-            message.author.send(
+            message.channel.send(
               "Alright, I have removed the Island Dweller role from you."
+            );
+          });
+        }
+        break;
+      case "minecraft":
+        let isMine = user.roles.find((r) => r.name === "Minecraft Time"); //check if user has jackbox time role
+
+        if (!isMine) {
+          user.addRole("725494456563925053").then(() => {
+            console.log(
+              "Minecraft Time role successfully added to " + user.nickname
+            );
+            message.channel.send(
+              "You're all set! You will now be mentioned whenever someones uses the !minecraft command. You can disable this anytime by using the !role minecraft command again!"
+            );
+          });
+        } else {
+          user.removeRole("725494456563925053").then(() => {
+            console.log(
+              "Minecraft Time role successfully removed from " + user.nickname
+            );
+            message.channel.send(
+              "Alright, I have removed the Minecraft Time role from you. You won't be mentioned again."
             );
           });
         }
@@ -640,6 +745,11 @@ const updateTextChannel = () =>
   textchannelupdate(STARTUP_MESSAGE, bot.channels.get(TEXT_CHANNEL));
 const updatePotTextChannel = () =>
   pottextchannelupdate(POT_STARTUP_MESSAGE, bot.channels.get(POT_TEXT_CHANNEL));
+const updateMineTextChannel = () =>
+  minetextchannelupdate(
+    POT_STARTUP_MESSAGE,
+    bot.channels.get(MINE_TEXT_CHANNEL)
+  );
 
 //Sets the "game" being played by the bot every 30 seconds
 bot.on("ready", () => {
@@ -649,6 +759,7 @@ bot.on("ready", () => {
   bot.setInterval(activityupdate, DEFAULT_UPDATE_INTERVAL);
   bot.setInterval(voicechannelupdate, DEFAULT_UPDATE_INTERVAL);
   bot.setInterval(potvoicechannelupdate, DEFAULT_UPDATE_INTERVAL);
+  bot.setInterval(minevoicechannelupdate, DEFAULT_UPDATE_INTERVAL);
 
   // After we send the first text-status message, set the loop.
   updateTextChannel().then(() => {
@@ -656,6 +767,9 @@ bot.on("ready", () => {
   });
   updatePotTextChannel().then(() => {
     bot.setInterval(updatePotTextChannel, DEFAULT_UPDATE_INTERVAL);
+  });
+  updateMineTextChannel().then(() => {
+    bot.setInterval(updateMineTextChannel, DEFAULT_UPDATE_INTERVAL);
   });
 });
 

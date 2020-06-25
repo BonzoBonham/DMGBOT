@@ -746,11 +746,6 @@ const updateTextChannel = () =>
   textchannelupdate(STARTUP_MESSAGE, bot.channels.get(TEXT_CHANNEL));
 const updatePotTextChannel = () =>
   pottextchannelupdate(POT_STARTUP_MESSAGE, bot.channels.get(POT_TEXT_CHANNEL));
-const updateMineTextChannel = () =>
-  minetextchannelupdate(
-    POT_STARTUP_MESSAGE,
-    bot.channels.get(MINE_TEXT_CHANNEL)
-  );
 
 //Sets the "game" being played by the bot every 30 seconds
 bot.on("ready", () => {
@@ -768,9 +763,6 @@ bot.on("ready", () => {
   });
   updatePotTextChannel().then(() => {
     bot.setInterval(updatePotTextChannel, DEFAULT_UPDATE_INTERVAL);
-  });
-  updateMineTextChannel().then(() => {
-    bot.setInterval(updateMineTextChannel, DEFAULT_UPDATE_INTERVAL);
   });
 });
 

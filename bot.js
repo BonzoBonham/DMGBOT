@@ -155,6 +155,7 @@ const getPotActivePlayers = (delimiter = ", \n") =>
 const getMineActivePlayers = (delimiter = ", \n") =>
   handleMineGamedigQuery()
     .then((state) => {
+      console.log("state.players");
       return Promise.resolve(
         state.players.length
           ? state.players.map((ply) => ply.name).join(delimiter)
